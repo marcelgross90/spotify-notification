@@ -13,17 +13,54 @@ struct SpotifyTrack: Equatable, Sendable {
     let album: String
     let artworkURL: URL?
     let spotifyURL: URL?
+    let duration: TimeInterval
+
+    init(
+        id: String,
+        name: String,
+        artist: String,
+        album: String,
+        artworkURL: URL?,
+        spotifyURL: URL?,
+        duration: TimeInterval = 0
+    ) {
+        self.id = id
+        self.name = name
+        self.artist = artist
+        self.album = album
+        self.artworkURL = artworkURL
+        self.spotifyURL = spotifyURL
+        self.duration = duration
+    }
 }
 
 struct SpotifySnapshot: Equatable, Sendable {
     let isRunning: Bool
     let state: SpotifyPlayerState
     let track: SpotifyTrack?
+    let position: TimeInterval
+    let volume: Int
+
+    init(
+        isRunning: Bool,
+        state: SpotifyPlayerState,
+        track: SpotifyTrack?,
+        position: TimeInterval = 0,
+        volume: Int = 0
+    ) {
+        self.isRunning = isRunning
+        self.state = state
+        self.track = track
+        self.position = position
+        self.volume = volume
+    }
 
     static let notRunning = SpotifySnapshot(
         isRunning: false,
         state: .stopped,
-        track: nil
+        track: nil,
+        position: 0,
+        volume: 0
     )
 }
 

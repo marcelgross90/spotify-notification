@@ -6,6 +6,8 @@ Eine persönliche macOS-Menüleisten-App, die die lokal installierte Spotify-App
 
 - Aktueller Titel, Künstler, Album und Cover
 - Play/Pause, vorheriger und nächster Titel
+- Wiedergabefortschritt und Laufzeit
+- Spotify-Lautstärke
 - Titel in Spotify öffnen
 - Native macOS-Mitteilung mit Albumcover bei einem Titelwechsel
 - Optionaler Autostart beim Anmelden

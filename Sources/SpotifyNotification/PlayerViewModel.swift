@@ -8,6 +8,7 @@ final class PlayerViewModel {
     private(set) var snapshot: SpotifySnapshot = .notRunning
     private(set) var errorMessage: String?
     private(set) var notificationMessage: String?
+    private(set) var volume: Double = 0
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
@@ -25,6 +26,7 @@ final class PlayerViewModel {
     private let notifier: TrackNotifying
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
+    private var isAdjustingVolume = false
 
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
@@ -62,6 +64,9 @@ final class PlayerViewModel {
             errorMessage = nil
             processTrackChange(newSnapshot)
             snapshot = newSnapshot
+            if !isAdjustingVolume {
+                volume = Double(newSnapshot.volume)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -77,6 +82,19 @@ final class PlayerViewModel {
 
     func previousTrack() {
         perform(spotify.previousTrack)
+    }
+
+    func updateVolume(_ newValue: Double) {
+        volume = min(max(newValue, 0), 100)
+    }
+
+    func setVolumeEditing(_ editing: Bool) {
+        isAdjustingVolume = editing
+        guard !editing else { return }
+
+        perform {
+            try spotify.setVolume(Int(volume.rounded()))
+        }
     }
 
     func openSpotify() {

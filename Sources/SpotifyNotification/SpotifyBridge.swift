@@ -7,6 +7,7 @@ protocol SpotifyControlling {
     func playPause() throws
     func nextTrack() throws
     func previousTrack() throws
+    func setVolume(_ volume: Int) throws
     func openSpotify()
     func openCurrentTrack(_ track: SpotifyTrack?)
 }
@@ -24,13 +25,14 @@ final class SpotifyBridge: SpotifyControlling {
     private lazy var previousTrackScript = NSAppleScript(
         source: "tell application id \"com.spotify.client\" to previous track"
     )
+    private var volumeScripts: [Int: NSAppleScript] = [:]
 
     private static let snapshotSource = """
     tell application id "com.spotify.client"
         if player state is stopped then return "stopped"
         set fieldSeparator to ASCII character 31
         set activeTrack to current track
-        return "track" & fieldSeparator & (player state as text) & fieldSeparator & (id of activeTrack as text) & fieldSeparator & (name of activeTrack as text) & fieldSeparator & (artist of activeTrack as text) & fieldSeparator & (album of activeTrack as text) & fieldSeparator & (artwork url of activeTrack as text) & fieldSeparator & (spotify url of activeTrack as text)
+        return "track" & fieldSeparator & (player state as text) & fieldSeparator & (id of activeTrack as text) & fieldSeparator & (name of activeTrack as text) & fieldSeparator & (artist of activeTrack as text) & fieldSeparator & (album of activeTrack as text) & fieldSeparator & (artwork url of activeTrack as text) & fieldSeparator & (spotify url of activeTrack as text) & fieldSeparator & (duration of activeTrack as text) & fieldSeparator & (player position as text) & fieldSeparator & (sound volume as text)
     end tell
     """
 
@@ -54,6 +56,24 @@ final class SpotifyBridge: SpotifyControlling {
 
     func previousTrack() throws {
         try execute(previousTrackScript)
+    }
+
+    func setVolume(_ volume: Int) throws {
+        let clampedVolume = min(max(volume, 0), 100)
+        let script: NSAppleScript
+        if let cachedScript = volumeScripts[clampedVolume] {
+            script = cachedScript
+        } else {
+            guard let newScript = NSAppleScript(
+                source: "tell application id \"com.spotify.client\" to set sound volume to \(clampedVolume)"
+            ) else {
+                throw SpotifyBridgeError.malformedResponse
+            }
+            volumeScripts[clampedVolume] = newScript
+            script = newScript
+        }
+
+        try execute(script)
     }
 
     func openSpotify() {

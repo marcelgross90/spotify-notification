@@ -13,7 +13,10 @@ struct SpotifyResponseParserTests {
             "Artist Name",
             "Album Name",
             "https://example.com/cover.jpg",
-            "spotify:track:123"
+            "spotify:track:123",
+            "245",
+            "42.5",
+            "65"
         ].joined(separator: separator)
 
         let snapshot = try SpotifyResponseParser.parse(response)
@@ -23,6 +26,22 @@ struct SpotifyResponseParserTests {
         #expect(snapshot.track?.name == "Song Name")
         #expect(snapshot.track?.artist == "Artist Name")
         #expect(snapshot.track?.artworkURL?.absoluteString == "https://example.com/cover.jpg")
+        #expect(snapshot.track?.duration == 245)
+        #expect(snapshot.position == 42.5)
+        #expect(snapshot.volume == 65)
+    }
+
+    @Test
+    func parsesLocalizedDecimalPosition() throws {
+        let separator = SpotifyResponseParser.separator
+        let response = [
+            "track", "paused", "id", "Song", "Artist", "Album", "", "",
+            "180", "12,5", "40"
+        ].joined(separator: separator)
+
+        let snapshot = try SpotifyResponseParser.parse(response)
+
+        #expect(snapshot.position == 12.5)
     }
 
     @Test

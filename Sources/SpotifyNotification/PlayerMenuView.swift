@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PlayerMenuView: View {
     @Bindable var model: PlayerViewModel
+    private let spotifyGreen = Color(red: 0.114, green: 0.725, blue: 0.329)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -92,6 +93,10 @@ struct PlayerMenuView: View {
                     Spacer()
                 }
 
+                playbackProgress(for: track)
+
+                volumeControl
+
                 Button("In Spotify anzeigen") {
                     model.openCurrentTrack()
                 }
@@ -110,6 +115,66 @@ struct PlayerMenuView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func playbackProgress(for track: SpotifyTrack) -> some View {
+        if track.duration > 0 {
+            let position = min(max(model.snapshot.position, 0), track.duration)
+
+            VStack(spacing: 4) {
+                ProgressView(value: position, total: track.duration)
+                    .progressViewStyle(.linear)
+                    .tint(spotifyGreen)
+
+                HStack {
+                    Text(formattedTime(position))
+                    Spacer()
+                    Text(formattedTime(track.duration))
+                }
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(.tertiary)
+            }
+        }
+    }
+
+    private var volumeControl: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "speaker.fill")
+                .foregroundStyle(.secondary)
+
+            Slider(
+                value: Binding(
+                    get: { model.volume },
+                    set: { value in
+                        model.updateVolume(value)
+                    }
+                ),
+                in: 0...100,
+                step: 1,
+                onEditingChanged: { editing in
+                    model.setVolumeEditing(editing)
+                }
+            )
+            .tint(spotifyGreen)
+            .accessibilityLabel("Spotify-Lautstärke")
+
+            Image(systemName: "speaker.wave.3.fill")
+                .foregroundStyle(.secondary)
+        }
+        .font(.caption)
+    }
+
+    private func formattedTime(_ seconds: TimeInterval) -> String {
+        let totalSeconds = max(0, Int(seconds.rounded(.down)))
+        let hours = totalSeconds / 3_600
+        let minutes = (totalSeconds % 3_600) / 60
+        let remainingSeconds = totalSeconds % 60
+
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, remainingSeconds)
+        }
+        return String(format: "%d:%02d", minutes, remainingSeconds)
     }
 
     private func artwork(for track: SpotifyTrack) -> some View {
