@@ -27,6 +27,11 @@ final class PlayerViewModel {
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
     private var isAdjustingVolume = false
+    private var lastNonZeroVolume: Double = 50
+
+    var isMuted: Bool {
+        volume == 0
+    }
 
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
@@ -66,6 +71,9 @@ final class PlayerViewModel {
             snapshot = newSnapshot
             if !isAdjustingVolume {
                 volume = Double(newSnapshot.volume)
+                if volume > 0 {
+                    lastNonZeroVolume = volume
+                }
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -86,6 +94,9 @@ final class PlayerViewModel {
 
     func updateVolume(_ newValue: Double) {
         volume = min(max(newValue, 0), 100)
+        if volume > 0 {
+            lastNonZeroVolume = volume
+        }
     }
 
     func setVolumeEditing(_ editing: Bool) {
@@ -94,6 +105,21 @@ final class PlayerViewModel {
 
         perform {
             try spotify.setVolume(Int(volume.rounded()))
+        }
+    }
+
+    func toggleMute() {
+        let targetVolume: Double
+        if isMuted {
+            targetVolume = lastNonZeroVolume
+        } else {
+            lastNonZeroVolume = volume
+            targetVolume = 0
+        }
+
+        volume = targetVolume
+        perform {
+            try spotify.setVolume(Int(targetVolume.rounded()))
         }
     }
 

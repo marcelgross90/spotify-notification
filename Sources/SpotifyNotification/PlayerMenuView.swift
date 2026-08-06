@@ -140,8 +140,16 @@ struct PlayerMenuView: View {
 
     private var volumeControl: some View {
         HStack(spacing: 10) {
-            Image(systemName: "speaker.fill")
-                .foregroundStyle(.secondary)
+            Button {
+                model.toggleMute()
+            } label: {
+                Image(systemName: model.isMuted ? "speaker.slash.fill" : "speaker.fill")
+                    .frame(width: 18, height: 18)
+                    .foregroundStyle(model.isMuted ? spotifyGreen : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(model.isMuted ? "Spotify-Ton einschalten" : "Spotify stummschalten")
+            .help(model.isMuted ? "Ton einschalten" : "Stummschalten")
 
             Slider(
                 value: Binding(

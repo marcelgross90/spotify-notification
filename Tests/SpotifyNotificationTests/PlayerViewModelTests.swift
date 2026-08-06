@@ -31,6 +31,35 @@ struct PlayerViewModelTests {
 
         #expect(spotify.lastSetVolume == 100)
     }
+
+    @Test
+    func muteRestoresPreviousVolume() {
+        let spotify = SpotifyControllerFake()
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.updateVolume(68)
+
+        model.toggleMute()
+        #expect(spotify.lastSetVolume == 0)
+
+        model.toggleMute()
+        #expect(spotify.lastSetVolume == 68)
+    }
+
+    @Test
+    func unmuteUsesSensibleDefaultWithoutPreviousVolume() {
+        let spotify = SpotifyControllerFake()
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+
+        model.toggleMute()
+
+        #expect(spotify.lastSetVolume == 50)
+    }
 }
 
 @MainActor
