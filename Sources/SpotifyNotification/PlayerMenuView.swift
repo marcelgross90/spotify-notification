@@ -5,128 +5,77 @@ struct PlayerMenuView: View {
     private let spotifyGreen = Color(red: 0.114, green: 0.725, blue: 0.329)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            playerContent
+        liquidGlassPanel {
+            VStack(alignment: .leading, spacing: 18) {
+                playerContent
 
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+                if let errorMessage = model.errorMessage {
+                    statusMessage(errorMessage, color: .red)
+                }
 
-            if let notificationMessage = model.notificationMessage {
-                Text(notificationMessage)
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Divider()
-
-            Toggle("Titelwechsel-Mitteilungen", isOn: $model.notificationsEnabled)
-
-            Toggle(
-                "Beim Anmelden öffnen",
-                isOn: Binding(
-                    get: { model.launchAtLoginEnabled },
-                    set: { enabled in
-                        model.setLaunchAtLogin(enabled)
-                    }
-                )
-            )
-
-            HStack {
-                Spacer()
-
-                Button("Beenden") {
-                    model.quit()
+                if let notificationMessage = model.notificationMessage {
+                    statusMessage(notificationMessage, color: .orange)
                 }
             }
+            .padding(22)
         }
-        .padding(16)
-        .frame(width: 340)
+        .padding(10)
+        .frame(width: 390)
     }
 
     @ViewBuilder
     private var playerContent: some View {
         if !model.snapshot.isRunning {
-            VStack(spacing: 12) {
-                ContentUnavailableView(
-                    "Spotify ist geschlossen",
-                    systemImage: "music.note",
-                    description: Text("Öffne Spotify, um die Wiedergabe anzuzeigen und zu steuern.")
-                )
-
-                Button("Spotify öffnen") {
-                    model.openSpotify()
-                }
-            }
+            unavailablePlayer(
+                title: "Spotify ist geschlossen",
+                systemImage: "music.note",
+                description: "Öffne Spotify, um die Wiedergabe anzuzeigen und zu steuern.",
+                buttonTitle: "Spotify öffnen"
+            )
         } else if let track = model.snapshot.track {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    artwork(for: track)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(track.name)
-                            .font(.headline)
-                            .lineLimit(2)
-                        Text(track.artist)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                        Text(track.album)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                            .lineLimit(1)
-                    }
-                }
-
-                HStack(spacing: 24) {
-                    Spacer()
-                    controlButton("backward.fill", "Vorheriger Titel", model.previousTrack)
-                    controlButton(
-                        model.snapshot.state == .playing ? "pause.fill" : "play.fill",
-                        model.snapshot.state == .playing ? "Pause" : "Wiedergabe",
-                        model.playPause
-                    )
-                    controlButton("forward.fill", "Nächster Titel", model.nextTrack)
-                    Spacer()
-                }
-
+            VStack(alignment: .leading, spacing: 18) {
+                trackHeader(for: track)
                 playbackProgress(for: track)
-
-                volumeControl
-
-                Button("In Spotify anzeigen") {
-                    model.openCurrentTrack()
-                }
-                .frame(maxWidth: .infinity)
+                playbackControls
+                Divider()
+                playerFooter
             }
         } else {
-            VStack(spacing: 12) {
-                ContentUnavailableView(
-                    "Keine Wiedergabe",
-                    systemImage: "pause.circle",
-                    description: Text("Starte einen Titel in Spotify.")
-                )
+            unavailablePlayer(
+                title: "Keine Wiedergabe",
+                systemImage: "pause.circle",
+                description: "Starte einen Titel in Spotify.",
+                buttonTitle: "Spotify anzeigen"
+            )
+        }
+    }
 
-                Button("Spotify anzeigen") {
-                    model.openSpotify()
-                }
+    private func trackHeader(for track: SpotifyTrack) -> some View {
+        HStack(spacing: 16) {
+            artwork(for: track)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(track.name)
+                    .font(.system(size: 20, weight: .bold))
+                    .lineLimit(2)
+                Text("\(track.artist) — \(track.album)")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
+
+            Spacer(minLength: 0)
         }
     }
 
     @ViewBuilder
     private func playbackProgress(for track: SpotifyTrack) -> some View {
         if track.duration > 0 {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Slider(
                     value: Binding(
                         get: { model.position },
-                        set: { value in
-                            model.updatePosition(value)
-                        }
+                        set: { model.updatePosition($0) }
                     ),
                     in: 0...track.duration,
                     step: 1,
@@ -144,19 +93,81 @@ struct PlayerMenuView: View {
                     Spacer()
                     Text(formattedTime(track.duration))
                 }
-                .font(.system(size: 11, design: .monospaced))
+                .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(.tertiary)
             }
         }
     }
 
+    private var playbackControls: some View {
+        HStack(spacing: 22) {
+            Spacer(minLength: 0)
+            modeButton(
+                "shuffle",
+                isActive: model.snapshot.isShuffling,
+                isEnabled: model.snapshot.isShuffleAvailable,
+                activeLabel: "Shuffle ausschalten",
+                inactiveLabel: "Shuffle einschalten",
+                action: { model.toggleShuffle() }
+            )
+            controlButton("backward.fill", "Vorheriger Titel", model.previousTrack)
+            playPauseButton
+            controlButton("forward.fill", "Nächster Titel", model.nextTrack)
+            modeButton(
+                "repeat",
+                isActive: model.snapshot.isRepeating,
+                isEnabled: model.snapshot.isRepeatAvailable,
+                activeLabel: "Wiederholung ausschalten",
+                inactiveLabel: "Wiederholung einschalten",
+                action: { model.toggleRepeat() }
+            )
+            Spacer(minLength: 0)
+        }
+    }
+
+    @ViewBuilder
+    private var playPauseButton: some View {
+        let systemName = model.snapshot.state == .playing ? "pause.fill" : "play.fill"
+        let label = model.snapshot.state == .playing ? "Pause" : "Wiedergabe"
+
+        if #available(macOS 26.0, *) {
+            Button(action: model.playPause) {
+                Image(systemName: systemName)
+                    .font(.system(size: 18, weight: .semibold))
+                    .frame(width: 42, height: 42)
+            }
+            .buttonStyle(.glass)
+            .accessibilityLabel(label)
+        } else {
+            Button(action: model.playPause) {
+                Image(systemName: systemName)
+                    .font(.system(size: 18, weight: .semibold))
+                    .frame(width: 42, height: 42)
+                    .background(.regularMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(label)
+        }
+    }
+
+    private var playerFooter: some View {
+        HStack(spacing: 14) {
+            Button("In Spotify anzeigen", action: model.openCurrentTrack)
+                .buttonStyle(.plain)
+                .font(.system(size: 14, weight: .medium))
+
+            Spacer(minLength: 8)
+
+            volumeControl
+            optionsMenu
+        }
+    }
+
     private var volumeControl: some View {
-        HStack(spacing: 10) {
-            Button {
-                model.toggleMute()
-            } label: {
+        HStack(spacing: 8) {
+            Button(action: model.toggleMute) {
                 Image(systemName: model.isMuted ? "speaker.slash.fill" : "speaker.fill")
-                    .frame(width: 18, height: 18)
+                    .frame(width: 17, height: 17)
                     .foregroundStyle(model.isMuted ? spotifyGreen : Color.secondary)
             }
             .buttonStyle(.plain)
@@ -166,9 +177,7 @@ struct PlayerMenuView: View {
             Slider(
                 value: Binding(
                     get: { model.volume },
-                    set: { value in
-                        model.updateVolume(value)
-                    }
+                    set: { model.updateVolume($0) }
                 ),
                 in: 0...100,
                 step: 1,
@@ -176,13 +185,70 @@ struct PlayerMenuView: View {
                     model.setVolumeEditing(editing)
                 }
             )
+            .frame(width: 78)
+            .controlSize(.small)
             .tint(spotifyGreen)
             .accessibilityLabel("Spotify-Lautstärke")
-
-            Image(systemName: "speaker.wave.3.fill")
-                .foregroundStyle(.secondary)
         }
-        .font(.caption)
+    }
+
+    private var optionsMenu: some View {
+        Menu {
+            Toggle("Titelwechsel-Mitteilungen", isOn: $model.notificationsEnabled)
+            Toggle(
+                "Beim Anmelden öffnen",
+                isOn: Binding(
+                    get: { model.launchAtLoginEnabled },
+                    set: { enabled in
+                        model.setLaunchAtLogin(enabled)
+                    }
+                )
+            )
+
+            Divider()
+
+            Button("Spotify öffnen", action: model.openSpotify)
+            Button("Beenden", action: model.quit)
+        } label: {
+            Image(systemName: "ellipsis")
+                .font(.system(size: 15, weight: .semibold))
+                .frame(width: 28, height: 28)
+                .contentShape(Circle())
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .accessibilityLabel("Weitere Optionen")
+        .help("Weitere Optionen")
+    }
+
+    private func unavailablePlayer(
+        title: String,
+        systemImage: String,
+        description: String,
+        buttonTitle: String
+    ) -> some View {
+        VStack(spacing: 14) {
+            ContentUnavailableView(
+                title,
+                systemImage: systemImage,
+                description: Text(description)
+            )
+
+            Button(buttonTitle, action: model.openSpotify)
+                .buttonStyle(.borderedProminent)
+
+            Divider()
+            optionsMenu
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+    }
+
+    private func statusMessage(_ message: String, color: Color) -> some View {
+        Label(message, systemImage: "exclamationmark.circle.fill")
+            .font(.caption)
+            .foregroundStyle(color)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func formattedTime(_ seconds: TimeInterval) -> String {
@@ -204,13 +270,18 @@ struct PlayerMenuView: View {
                 .scaledToFill()
         } placeholder: {
             ZStack {
-                Color.secondary.opacity(0.15)
+                Color.secondary.opacity(0.12)
                 Image(systemName: "music.note")
+                    .font(.title2)
                     .foregroundStyle(.secondary)
             }
         }
-        .frame(width: 72, height: 72)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .frame(width: 84, height: 84)
+        .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .stroke(.white.opacity(0.12), lineWidth: 0.5)
+        }
     }
 
     private func controlButton(
@@ -220,10 +291,48 @@ struct PlayerMenuView: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.title2)
+                .font(.system(size: 17, weight: .semibold))
                 .frame(width: 28, height: 28)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
+    }
+
+    private func modeButton(
+        _ systemName: String,
+        isActive: Bool,
+        isEnabled: Bool,
+        activeLabel: String,
+        inactiveLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .semibold))
+                .frame(width: 26, height: 26)
+                .foregroundStyle(isActive ? spotifyGreen : Color.secondary)
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.32)
+        .accessibilityLabel(isActive ? activeLabel : inactiveLabel)
+        .help(isActive ? activeLabel : inactiveLabel)
+    }
+
+    @ViewBuilder
+    private func liquidGlassPanel<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        if #available(macOS 26.0, *) {
+            content()
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+        } else {
+            content()
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .stroke(.separator.opacity(0.5), lineWidth: 1)
+                }
+        }
     }
 }

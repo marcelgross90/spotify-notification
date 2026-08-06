@@ -8,6 +8,7 @@ Eine persönliche macOS-Menüleisten-App, die die lokal installierte Spotify-App
 - Play/Pause, vorheriger und nächster Titel
 - Wiedergabefortschritt, Laufzeit und Spulen
 - Spotify-Lautstärke mit Stummschaltung
+- Shuffle und Wiederholung, wenn der Wiedergabekontext sie unterstützt
 - Titel in Spotify öffnen
 - Native macOS-Mitteilung mit Albumcover bei einem Titelwechsel
 - Optionaler Autostart beim Anmelden

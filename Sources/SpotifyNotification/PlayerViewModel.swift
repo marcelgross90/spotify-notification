@@ -146,6 +146,20 @@ final class PlayerViewModel {
         }
     }
 
+    func toggleShuffle() {
+        guard snapshot.isShuffleAvailable else { return }
+        perform {
+            try spotify.setShuffle(!snapshot.isShuffling)
+        }
+    }
+
+    func toggleRepeat() {
+        guard snapshot.isRepeatAvailable else { return }
+        perform {
+            try spotify.setRepeat(!snapshot.isRepeating)
+        }
+    }
+
     func openSpotify() {
         spotify.openSpotify()
     }

@@ -93,9 +93,52 @@ struct PlayerViewModelTests {
         #expect(spotify.lastSeekPosition == 245)
     }
 
+    @Test
+    func enablesShuffleWhenItIsAvailableAndInactive() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(
+            duration: 245,
+            position: 42,
+            isShuffleAvailable: true
+        )
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.refresh()
+
+        model.toggleShuffle()
+
+        #expect(spotify.lastShuffleState == true)
+    }
+
+    @Test
+    func disablesRepeatWhenItIsAvailableAndActive() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(
+            duration: 245,
+            position: 42,
+            isRepeatAvailable: true,
+            isRepeating: true
+        )
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.refresh()
+
+        model.toggleRepeat()
+
+        #expect(spotify.lastRepeatState == false)
+    }
+
     private func playingSnapshot(
         duration: TimeInterval,
-        position: TimeInterval
+        position: TimeInterval,
+        isShuffleAvailable: Bool = false,
+        isShuffling: Bool = false,
+        isRepeatAvailable: Bool = false,
+        isRepeating: Bool = false
     ) -> SpotifySnapshot {
         SpotifySnapshot(
             isRunning: true,
@@ -110,7 +153,11 @@ struct PlayerViewModelTests {
                 duration: duration
             ),
             position: position,
-            volume: 50
+            volume: 50,
+            isShuffleAvailable: isShuffleAvailable,
+            isShuffling: isShuffling,
+            isRepeatAvailable: isRepeatAvailable,
+            isRepeating: isRepeating
         )
     }
 }
@@ -119,6 +166,8 @@ struct PlayerViewModelTests {
 private final class SpotifyControllerFake: SpotifyControlling {
     var lastSetVolume: Int?
     var lastSeekPosition: TimeInterval?
+    var lastShuffleState: Bool?
+    var lastRepeatState: Bool?
     var snapshotValue: SpotifySnapshot = .notRunning
 
     func snapshot() throws -> SpotifySnapshot {
@@ -135,6 +184,14 @@ private final class SpotifyControllerFake: SpotifyControlling {
 
     func seek(to position: TimeInterval) throws {
         lastSeekPosition = position
+    }
+
+    func setShuffle(_ enabled: Bool) throws {
+        lastShuffleState = enabled
+    }
+
+    func setRepeat(_ enabled: Bool) throws {
+        lastRepeatState = enabled
     }
 
     func openSpotify() {}

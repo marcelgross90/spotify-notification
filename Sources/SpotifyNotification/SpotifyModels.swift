@@ -40,19 +40,31 @@ struct SpotifySnapshot: Equatable, Sendable {
     let track: SpotifyTrack?
     let position: TimeInterval
     let volume: Int
+    let isShuffleAvailable: Bool
+    let isShuffling: Bool
+    let isRepeatAvailable: Bool
+    let isRepeating: Bool
 
     init(
         isRunning: Bool,
         state: SpotifyPlayerState,
         track: SpotifyTrack?,
         position: TimeInterval = 0,
-        volume: Int = 0
+        volume: Int = 0,
+        isShuffleAvailable: Bool = false,
+        isShuffling: Bool = false,
+        isRepeatAvailable: Bool = false,
+        isRepeating: Bool = false
     ) {
         self.isRunning = isRunning
         self.state = state
         self.track = track
         self.position = position
         self.volume = volume
+        self.isShuffleAvailable = isShuffleAvailable
+        self.isShuffling = isShuffling
+        self.isRepeatAvailable = isRepeatAvailable
+        self.isRepeating = isRepeating
     }
 
     static let notRunning = SpotifySnapshot(
@@ -60,7 +72,11 @@ struct SpotifySnapshot: Equatable, Sendable {
         state: .stopped,
         track: nil,
         position: 0,
-        volume: 0
+        volume: 0,
+        isShuffleAvailable: false,
+        isShuffling: false,
+        isRepeatAvailable: false,
+        isRepeating: false
     )
 }
 

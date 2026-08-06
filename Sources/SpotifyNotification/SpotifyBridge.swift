@@ -9,6 +9,8 @@ protocol SpotifyControlling {
     func previousTrack() throws
     func setVolume(_ volume: Int) throws
     func seek(to position: TimeInterval) throws
+    func setShuffle(_ enabled: Bool) throws
+    func setRepeat(_ enabled: Bool) throws
     func openSpotify()
     func openCurrentTrack(_ track: SpotifyTrack?)
 }
@@ -28,13 +30,25 @@ final class SpotifyBridge: SpotifyControlling {
     )
     private var volumeScripts: [Int: NSAppleScript] = [:]
     private var seekScripts: [Int: NSAppleScript] = [:]
+    private lazy var shuffleOnScript = NSAppleScript(
+        source: "tell application id \"com.spotify.client\" to set shuffling to true"
+    )
+    private lazy var shuffleOffScript = NSAppleScript(
+        source: "tell application id \"com.spotify.client\" to set shuffling to false"
+    )
+    private lazy var repeatOnScript = NSAppleScript(
+        source: "tell application id \"com.spotify.client\" to set repeating to true"
+    )
+    private lazy var repeatOffScript = NSAppleScript(
+        source: "tell application id \"com.spotify.client\" to set repeating to false"
+    )
 
     private static let snapshotSource = """
     tell application id "com.spotify.client"
         if player state is stopped then return "stopped"
         set fieldSeparator to ASCII character 31
         set activeTrack to current track
-        return "track" & fieldSeparator & (player state as text) & fieldSeparator & (id of activeTrack as text) & fieldSeparator & (name of activeTrack as text) & fieldSeparator & (artist of activeTrack as text) & fieldSeparator & (album of activeTrack as text) & fieldSeparator & (artwork url of activeTrack as text) & fieldSeparator & (spotify url of activeTrack as text) & fieldSeparator & (duration of activeTrack as text) & fieldSeparator & (player position as text) & fieldSeparator & (sound volume as text)
+        return "track" & fieldSeparator & (player state as text) & fieldSeparator & (id of activeTrack as text) & fieldSeparator & (name of activeTrack as text) & fieldSeparator & (artist of activeTrack as text) & fieldSeparator & (album of activeTrack as text) & fieldSeparator & (artwork url of activeTrack as text) & fieldSeparator & (spotify url of activeTrack as text) & fieldSeparator & (duration of activeTrack as text) & fieldSeparator & (player position as text) & fieldSeparator & (sound volume as text) & fieldSeparator & (shuffling enabled as text) & fieldSeparator & (shuffling as text) & fieldSeparator & (repeating enabled as text) & fieldSeparator & (repeating as text)
     end tell
     """
 
@@ -94,6 +108,14 @@ final class SpotifyBridge: SpotifyControlling {
         }
 
         try execute(script)
+    }
+
+    func setShuffle(_ enabled: Bool) throws {
+        try execute(enabled ? shuffleOnScript : shuffleOffScript)
+    }
+
+    func setRepeat(_ enabled: Bool) throws {
+        try execute(enabled ? repeatOnScript : repeatOffScript)
     }
 
     func openSpotify() {

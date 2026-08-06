@@ -14,12 +14,16 @@ enum SpotifyResponseParser {
         }
 
         let fields = response.components(separatedBy: separator)
-        guard fields.count == 11,
+        guard fields.count == 15,
               fields[0] == "track",
               let state = SpotifyPlayerState(rawValue: fields[1]),
               let durationInMilliseconds = number(from: fields[8]),
               let position = number(from: fields[9]),
-              let volume = Int(fields[10]) else {
+              let volume = Int(fields[10]),
+              let isShuffleAvailable = boolean(from: fields[11]),
+              let isShuffling = boolean(from: fields[12]),
+              let isRepeatAvailable = boolean(from: fields[13]),
+              let isRepeating = boolean(from: fields[14]) else {
             throw SpotifyBridgeError.malformedResponse
         }
 
@@ -38,11 +42,23 @@ enum SpotifyResponseParser {
             state: state,
             track: track,
             position: position,
-            volume: min(max(volume, 0), 100)
+            volume: min(max(volume, 0), 100),
+            isShuffleAvailable: isShuffleAvailable,
+            isShuffling: isShuffling,
+            isRepeatAvailable: isRepeatAvailable,
+            isRepeating: isRepeating
         )
     }
 
     private static func number(from value: String) -> Double? {
         Double(value.replacingOccurrences(of: ",", with: "."))
+    }
+
+    private static func boolean(from value: String) -> Bool? {
+        switch value.lowercased() {
+        case "true": true
+        case "false": false
+        default: nil
+        }
     }
 }

@@ -16,7 +16,11 @@ struct SpotifyResponseParserTests {
             "spotify:track:123",
             "245000",
             "42.5",
-            "65"
+            "65",
+            "true",
+            "false",
+            "true",
+            "true"
         ].joined(separator: separator)
 
         let snapshot = try SpotifyResponseParser.parse(response)
@@ -29,6 +33,10 @@ struct SpotifyResponseParserTests {
         #expect(snapshot.track?.duration == 245)
         #expect(snapshot.position == 42.5)
         #expect(snapshot.volume == 65)
+        #expect(snapshot.isShuffleAvailable)
+        #expect(!snapshot.isShuffling)
+        #expect(snapshot.isRepeatAvailable)
+        #expect(snapshot.isRepeating)
     }
 
     @Test
@@ -36,7 +44,7 @@ struct SpotifyResponseParserTests {
         let separator = SpotifyResponseParser.separator
         let response = [
             "track", "playing", "id", "Short Song", "Artist", "Album", "", "",
-            "9500", "3.25", "50"
+            "9500", "3.25", "50", "true", "false", "true", "false"
         ].joined(separator: separator)
 
         let snapshot = try SpotifyResponseParser.parse(response)
@@ -50,7 +58,7 @@ struct SpotifyResponseParserTests {
         let separator = SpotifyResponseParser.separator
         let response = [
             "track", "paused", "id", "Song", "Artist", "Album", "", "",
-            "180000", "12,5", "40"
+            "180000", "12,5", "40", "false", "false", "false", "false"
         ].joined(separator: separator)
 
         let snapshot = try SpotifyResponseParser.parse(response)
