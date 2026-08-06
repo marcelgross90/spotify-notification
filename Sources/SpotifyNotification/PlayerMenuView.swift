@@ -36,10 +36,6 @@ struct PlayerMenuView: View {
             )
 
             HStack {
-                Button("Spotify öffnen") {
-                    model.openSpotify()
-                }
-
                 Spacer()
 
                 Button("Beenden") {
@@ -54,11 +50,17 @@ struct PlayerMenuView: View {
     @ViewBuilder
     private var playerContent: some View {
         if !model.snapshot.isRunning {
-            ContentUnavailableView(
-                "Spotify ist geschlossen",
-                systemImage: "music.note",
-                description: Text("Öffne Spotify, um die Wiedergabe anzuzeigen und zu steuern.")
-            )
+            VStack(spacing: 12) {
+                ContentUnavailableView(
+                    "Spotify ist geschlossen",
+                    systemImage: "music.note",
+                    description: Text("Öffne Spotify, um die Wiedergabe anzuzeigen und zu steuern.")
+                )
+
+                Button("Spotify öffnen") {
+                    model.openSpotify()
+                }
+            }
         } else if let track = model.snapshot.track {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
@@ -96,11 +98,17 @@ struct PlayerMenuView: View {
                 .frame(maxWidth: .infinity)
             }
         } else {
-            ContentUnavailableView(
-                "Keine Wiedergabe",
-                systemImage: "pause.circle",
-                description: Text("Starte einen Titel in Spotify.")
-            )
+            VStack(spacing: 12) {
+                ContentUnavailableView(
+                    "Keine Wiedergabe",
+                    systemImage: "pause.circle",
+                    description: Text("Starte einen Titel in Spotify.")
+                )
+
+                Button("Spotify anzeigen") {
+                    model.openSpotify()
+                }
+            }
         }
     }
 
