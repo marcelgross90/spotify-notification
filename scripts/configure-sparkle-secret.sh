@@ -4,9 +4,10 @@ set -euo pipefail
 
 project_root="${0:A:h:h}"
 key_tool="$project_root/.build/artifacts/sparkle/Sparkle/bin/generate_keys"
-temporary_key="$(mktemp)"
+temporary_directory="$(mktemp -d)"
+temporary_key="$temporary_directory/sparkle-private-key"
 
-trap 'rm -f "$temporary_key"' EXIT
+trap 'rm -f "$temporary_key"; rmdir "$temporary_directory" 2>/dev/null || true' EXIT
 
 if ! command -v gh >/dev/null 2>&1; then
     echo "GitHub CLI is required: https://cli.github.com/" >&2
