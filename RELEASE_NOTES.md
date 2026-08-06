@@ -1,3 +1,4 @@
-# Spotify Notification 0.8.2
+# Spotify Notification 0.8.3
 
-- Fixed a crash when opening Settings from an installed app by packaging the keyboard-shortcut localization resources at the correct macOS bundle location.
+- Fixed the Settings crash after a Sparkle update by resolving the keyboard-shortcut localization bundle from the installed app resources.
+- Added a packaged-app runtime check so releases fail before publication if the shortcut recorder cannot load its resources.

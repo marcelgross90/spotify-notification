@@ -1,0 +1,27 @@
+diff --git a/Sources/KeyboardShortcuts/Utilities.swift b/Sources/KeyboardShortcuts/Utilities.swift
+index e0ac95f..ea17baf 100644
+--- a/Sources/KeyboardShortcuts/Utilities.swift
++++ b/Sources/KeyboardShortcuts/Utilities.swift
+@@ -9,5 +9,17 @@ import OSLog
+ #if os(macOS)
+ import Carbon.HIToolbox
+-
+-
++
++
++private var keyboardShortcutsResourceBundle: Bundle {
++	let bundleName = "KeyboardShortcuts_KeyboardShortcuts.bundle"
++
++	if let resourceURL = Bundle.main.resourceURL?.appendingPathComponent(bundleName),
++	   let resourceBundle = Bundle(url: resourceURL) {
++		return resourceBundle
++	}
++
++	return .module
++}
++
++
+ extension String {
+@@ -18,1 +30,1 @@ extension String {
+-		NSLocalizedString(self, bundle: .module, comment: self)
++		NSLocalizedString(self, bundle: keyboardShortcutsResourceBundle, comment: self)

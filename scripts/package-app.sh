@@ -11,23 +11,25 @@ frameworks_path="$contents_path/Frameworks"
 
 rm -rf "$app_path"
 
+swift package \
+    --package-path "$project_root" \
+    --scratch-path "$build_path" \
+    resolve
+
+keyboard_shortcuts_checkout="$build_path/checkouts/KeyboardShortcuts"
+keyboard_shortcuts_utilities="$keyboard_shortcuts_checkout/Sources/KeyboardShortcuts/Utilities.swift"
+keyboard_shortcuts_patch="$project_root/patches/KeyboardShortcuts-installed-resource-bundle.patch"
+if ! grep -q "keyboardShortcutsResourceBundle" "$keyboard_shortcuts_utilities"; then
+    chmod u+w "$keyboard_shortcuts_utilities"
+    git -C "$keyboard_shortcuts_checkout" apply \
+        --unidiff-zero \
+        "$keyboard_shortcuts_patch"
+fi
+
 swift build \
     --package-path "$project_root" \
     --scratch-path "$build_path" \
     --configuration "$configuration"
-
-keyboard_shortcuts_accessor="$build_path/arm64-apple-macosx/$configuration/KeyboardShortcuts.build/DerivedSources/resource_bundle_accessor.swift"
-if [[ -f "$keyboard_shortcuts_accessor" ]] && \
-    grep -q "Bundle.main.bundleURL" "$keyboard_shortcuts_accessor"; then
-    sed -i '' \
-        's/Bundle.main.bundleURL/Bundle.main.resourceURL!/' \
-        "$keyboard_shortcuts_accessor"
-    touch "$keyboard_shortcuts_accessor"
-    swift build \
-        --package-path "$project_root" \
-        --scratch-path "$build_path" \
-        --configuration "$configuration"
-fi
 
 binary_path="$(swift build \
     --package-path "$project_root" \
@@ -58,5 +60,8 @@ install_name_tool \
     "$contents_path/MacOS/SpotifyNotification"
 
 codesign --force --deep --sign - "$app_path"
+
+SPOTIFY_NOTIFICATION_VERIFY_SHORTCUT_RESOURCES=1 \
+    "$contents_path/MacOS/SpotifyNotification"
 
 echo "$app_path"

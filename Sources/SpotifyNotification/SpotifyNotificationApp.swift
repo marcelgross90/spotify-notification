@@ -1,3 +1,5 @@
+import Darwin
+import KeyboardShortcuts
 import SwiftUI
 
 @main
@@ -7,6 +9,13 @@ struct SpotifyNotificationApp: App {
     private let shortcutService: GlobalShortcutService
 
     init() {
+        if ProcessInfo.processInfo.environment[
+            "SPOTIFY_NOTIFICATION_VERIFY_SHORTCUT_RESOURCES"
+        ] == "1" {
+            _ = KeyboardShortcuts.RecorderCocoa(for: .playPauseSpotify)
+            exit(EXIT_SUCCESS)
+        }
+
         let model = PlayerViewModel()
         _model = State(initialValue: model)
         shortcutService = GlobalShortcutService(model: model)
