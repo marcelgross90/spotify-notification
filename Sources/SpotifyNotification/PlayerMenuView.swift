@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PlayerMenuView: View {
+    @Environment(\.dismiss) private var dismiss
     @Bindable var model: PlayerViewModel
     private let spotifyGreen = Color(red: 0.114, green: 0.725, blue: 0.329)
 
@@ -249,7 +250,10 @@ struct PlayerMenuView: View {
                         : "circle"
                 )
             }
-            Button(L10n.string("menu.check_for_updates"), action: model.checkForUpdates)
+            Button(
+                L10n.string("menu.check_for_updates"),
+                action: checkForUpdates
+            )
 
             Divider()
 
@@ -265,6 +269,15 @@ struct PlayerMenuView: View {
         .fixedSize()
         .accessibilityLabel(L10n.string("menu.more_options"))
         .help(L10n.string("menu.more_options"))
+    }
+
+    private func checkForUpdates() {
+        dismiss()
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(150))
+            model.checkForUpdates()
+        }
     }
 
     private func unavailablePlayer(
