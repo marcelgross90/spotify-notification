@@ -1,4 +1,3 @@
-# Spotify Notification 0.8.1
+# Spotify Notification 0.8.2
 
-- Added an opt-in setting to automatically download and install signed updates.
-- Enabling automatic installation also enables scheduled update checks. Turning scheduled checks off disables automatic installation as well.
+- Fixed a crash when opening Settings from an installed app by packaging the keyboard-shortcut localization resources at the correct macOS bundle location.

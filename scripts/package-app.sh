@@ -16,6 +16,19 @@ swift build \
     --scratch-path "$build_path" \
     --configuration "$configuration"
 
+keyboard_shortcuts_accessor="$build_path/arm64-apple-macosx/$configuration/KeyboardShortcuts.build/DerivedSources/resource_bundle_accessor.swift"
+if [[ -f "$keyboard_shortcuts_accessor" ]] && \
+    grep -q "Bundle.main.bundleURL" "$keyboard_shortcuts_accessor"; then
+    sed -i '' \
+        's/Bundle.main.bundleURL/Bundle.main.resourceURL!/' \
+        "$keyboard_shortcuts_accessor"
+    touch "$keyboard_shortcuts_accessor"
+    swift build \
+        --package-path "$project_root" \
+        --scratch-path "$build_path" \
+        --configuration "$configuration"
+fi
+
 binary_path="$(swift build \
     --package-path "$project_root" \
     --scratch-path "$build_path" \
