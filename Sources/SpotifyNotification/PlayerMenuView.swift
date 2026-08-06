@@ -71,30 +71,38 @@ struct PlayerMenuView: View {
     @ViewBuilder
     private func playbackProgress(for track: SpotifyTrack) -> some View {
         if track.duration > 0 {
-            VStack(spacing: 6) {
-                Slider(
-                    value: Binding(
-                        get: { model.position },
-                        set: { model.updatePosition($0) }
-                    ),
-                    in: 0...track.duration,
-                    step: 1,
-                    onEditingChanged: { editing in
-                        model.setPositionEditing(editing)
-                    }
+            TimelineView(
+                .animation(
+                    minimumInterval: 1.0 / 30.0,
+                    paused: model.snapshot.state != .playing || model.isSeeking
                 )
-                .controlSize(.small)
-                .tint(spotifyGreen)
-                .accessibilityLabel("Wiedergabeposition")
-                .accessibilityValue(formattedTime(model.position))
+            ) { context in
+                let displayedPosition = model.displayedPosition(at: context.date)
 
-                HStack {
-                    Text(formattedTime(model.position))
-                    Spacer()
-                    Text(formattedTime(track.duration))
+                VStack(spacing: 6) {
+                    Slider(
+                        value: Binding(
+                            get: { displayedPosition },
+                            set: { model.updatePosition($0) }
+                        ),
+                        in: 0...track.duration,
+                        onEditingChanged: { editing in
+                            model.setPositionEditing(editing)
+                        }
+                    )
+                    .controlSize(.small)
+                    .tint(spotifyGreen)
+                    .accessibilityLabel("Wiedergabeposition")
+                    .accessibilityValue(formattedTime(displayedPosition))
+
+                    HStack {
+                        Text(formattedTime(displayedPosition))
+                        Spacer()
+                        Text(formattedTime(track.duration))
+                    }
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.tertiary)
                 }
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(.tertiary)
             }
         }
     }
@@ -180,7 +188,6 @@ struct PlayerMenuView: View {
                     set: { model.updateVolume($0) }
                 ),
                 in: 0...100,
-                step: 1,
                 onEditingChanged: { editing in
                     model.setVolumeEditing(editing)
                 }

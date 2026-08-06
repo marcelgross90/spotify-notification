@@ -94,6 +94,48 @@ struct PlayerViewModelTests {
     }
 
     @Test
+    func advancesDisplayedPositionContinuouslyWhilePlaying() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        let refreshDate = Date(timeIntervalSince1970: 1_000)
+        model.refresh(at: refreshDate)
+
+        let displayedPosition = model.displayedPosition(
+            at: refreshDate.addingTimeInterval(2.5)
+        )
+
+        #expect(displayedPosition == 44.5)
+    }
+
+    @Test
+    func keepsDisplayedPositionStillWhilePaused() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = SpotifySnapshot(
+            isRunning: true,
+            state: .paused,
+            track: playingSnapshot(duration: 245, position: 42).track,
+            position: 42,
+            volume: 50
+        )
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        let refreshDate = Date(timeIntervalSince1970: 1_000)
+        model.refresh(at: refreshDate)
+
+        let displayedPosition = model.displayedPosition(
+            at: refreshDate.addingTimeInterval(2.5)
+        )
+
+        #expect(displayedPosition == 42)
+    }
+
+    @Test
     func enablesShuffleWhenItIsAvailableAndInactive() {
         let spotify = SpotifyControllerFake()
         spotify.snapshotValue = playingSnapshot(

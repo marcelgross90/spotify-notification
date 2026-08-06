@@ -10,6 +10,7 @@ final class PlayerViewModel {
     private(set) var notificationMessage: String?
     private(set) var volume: Double = 0
     private(set) var position: Double = 0
+    private(set) var isSeeking = false
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
@@ -28,7 +29,7 @@ final class PlayerViewModel {
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
     private var isAdjustingVolume = false
-    private var isSeeking = false
+    private var positionUpdatedAt = Date.now
     private var lastNonZeroVolume: Double = 50
 
     var isMuted: Bool {
@@ -65,7 +66,7 @@ final class PlayerViewModel {
         }
     }
 
-    func refresh() {
+    func refresh(at date: Date = .now) {
         do {
             let newSnapshot = try spotify.snapshot()
             errorMessage = nil
@@ -82,6 +83,7 @@ final class PlayerViewModel {
                     max(newSnapshot.position, 0),
                     newSnapshot.track?.duration ?? 0
                 )
+                positionUpdatedAt = date
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -134,6 +136,17 @@ final class PlayerViewModel {
     func updatePosition(_ newValue: Double) {
         let duration = snapshot.track?.duration ?? 0
         position = min(max(newValue, 0), duration)
+    }
+
+    func displayedPosition(at date: Date) -> Double {
+        guard !isSeeking,
+              snapshot.state == .playing,
+              let duration = snapshot.track?.duration else {
+            return position
+        }
+
+        let elapsed = max(0, date.timeIntervalSince(positionUpdatedAt))
+        return min(position + elapsed, duration)
     }
 
     func setPositionEditing(_ editing: Bool) {
