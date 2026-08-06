@@ -23,6 +23,7 @@ A lightweight macOS menu bar player for the locally installed Spotify desktop ap
 - Native settings and permission status window
 - Secure in-app updates powered by Sparkle
 - Optional daily background update checks
+- Optional automatic download and installation of signed updates
 - Native Liquid Glass design on macOS 26 with a material fallback on older systems
 - No Spotify OAuth, cloud storage, analytics, statistics, or telemetry
 
@@ -58,9 +59,11 @@ The app runs only in the menu bar and does not add an icon to the Dock.
 
 ## Updates
 
-Open the three-dot menu and select **Check for updates**. If a signed update is available, the app shows its release information and can download, install, and relaunch itself after confirmation. Automatic daily checks are optional and disabled by default.
+Open **Settings → Updates** to check for updates manually or configure automatic updates. If a signed update is available, the app shows its release information and can download, install, and relaunch itself.
 
-Updates are delivered through [Sparkle](https://sparkle-project.org/) and GitHub Releases. Both the appcast feed and every update archive are verified with an EdDSA signature before extraction. Automatic checks and automatic download and installation can be configured in Settings.
+Automatic daily checks and automatic download and installation are optional and disabled by default. Enabling automatic installation also enables daily checks. Disabling automatic checks disables automatic installation as well.
+
+Updates are delivered through [Sparkle](https://sparkle-project.org/) and GitHub Releases. Both the appcast feed and every update archive are verified with an EdDSA signature before extraction.
 
 Personal builds use an ad-hoc application signature and are not notarized. The initial installation therefore still requires the one-time Gatekeeper confirmation described above. Sparkle update signatures protect subsequent updates independently of an Apple Developer ID.
 
