@@ -64,6 +64,18 @@ final class PlayerViewModel {
     var automaticallyChecksForUpdates: Bool {
         didSet {
             updateController.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+            if !automaticallyChecksForUpdates && automaticallyDownloadsUpdates {
+                automaticallyDownloadsUpdates = false
+            }
+        }
+    }
+
+    var automaticallyDownloadsUpdates: Bool {
+        didSet {
+            if automaticallyDownloadsUpdates && !automaticallyChecksForUpdates {
+                automaticallyChecksForUpdates = true
+            }
+            updateController.automaticallyDownloadsUpdates = automaticallyDownloadsUpdates
         }
     }
 
@@ -102,6 +114,8 @@ final class PlayerViewModel {
         self.notifier = notifier
         self.updateController = updateController
         self.automaticallyChecksForUpdates = updateController.automaticallyChecksForUpdates
+        self.automaticallyDownloadsUpdates = updateController.automaticallyChecksForUpdates
+            && updateController.automaticallyDownloadsUpdates
         self.appVersion = appVersion
         self.appBuild = appBuild
         let storedDisplayMode = UserDefaults.standard.string(

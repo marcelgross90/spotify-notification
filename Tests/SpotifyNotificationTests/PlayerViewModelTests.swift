@@ -218,6 +218,39 @@ struct PlayerViewModelTests {
     }
 
     @Test
+    func changesAutomaticUpdateDownloadsThroughUpdater() {
+        let updater = AppUpdaterFake()
+        let model = PlayerViewModel(
+            spotify: SpotifyControllerFake(),
+            notifier: TrackNotifierFake(),
+            updateController: updater
+        )
+
+        model.automaticallyDownloadsUpdates = true
+
+        #expect(model.automaticallyChecksForUpdates)
+        #expect(updater.automaticallyChecksForUpdates)
+        #expect(updater.automaticallyDownloadsUpdates)
+    }
+
+    @Test
+    func disablingAutomaticChecksAlsoDisablesAutomaticDownloads() {
+        let updater = AppUpdaterFake()
+        updater.automaticallyChecksForUpdates = true
+        updater.automaticallyDownloadsUpdates = true
+        let model = PlayerViewModel(
+            spotify: SpotifyControllerFake(),
+            notifier: TrackNotifierFake(),
+            updateController: updater
+        )
+
+        model.automaticallyChecksForUpdates = false
+
+        #expect(!model.automaticallyDownloadsUpdates)
+        #expect(!updater.automaticallyDownloadsUpdates)
+    }
+
+    @Test
     func exposesCurrentTrackForMenuBarWhenEnabled() {
         let spotify = SpotifyControllerFake()
         spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
@@ -393,6 +426,7 @@ private final class TrackNotifierFake: TrackNotifying {
 @MainActor
 private final class AppUpdaterFake: AppUpdating {
     var automaticallyChecksForUpdates = false
+    var automaticallyDownloadsUpdates = false
     var checkCount = 0
 
     func checkForUpdates() {

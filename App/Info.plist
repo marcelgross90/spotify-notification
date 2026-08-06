@@ -17,9 +17,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-	<string>0.8.0</string>
+	<string>0.8.1</string>
     <key>CFBundleVersion</key>
-	<string>20</string>
+	<string>21</string>
     <key>CFBundleLocalizations</key>
     <array>
         <string>de</string>
@@ -39,7 +39,7 @@
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Marcel Groß</string>
     <key>SUAllowsAutomaticUpdates</key>
-    <false/>
+    <true/>
     <key>SUAutomaticallyUpdate</key>
     <false/>
     <key>SUEnableAutomaticChecks</key>

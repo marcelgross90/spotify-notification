@@ -83,5 +83,7 @@
 "settings.permissions.open" = "Open…";
 "settings.permissions.refresh" = "Status vernieuwen";
 "settings.updates.release_notes" = "Nieuwe versies tonen hun wijzigingen rechtstreeks in het updatevenster.";
+"settings.updates.automatic_installation" = "Updates automatisch downloaden en installeren";
+"settings.updates.automatic_installation.detail" = "Ondertekende updates worden automatisch gedownload en door Sparkle geïnstalleerd. Automatisch zoeken wordt ook ingeschakeld.";
 "settings.updates.version" = "Versie";
 "settings.updates.installed_version" = "Geïnstalleerd";

@@ -60,7 +60,7 @@ The app runs only in the menu bar and does not add an icon to the Dock.
 
 Open the three-dot menu and select **Check for updates**. If a signed update is available, the app shows its release information and can download, install, and relaunch itself after confirmation. Automatic daily checks are optional and disabled by default.
 
-Updates are delivered through [Sparkle](https://sparkle-project.org/) and GitHub Releases. Both the appcast feed and every update archive are verified with an EdDSA signature before extraction. Silent automatic downloads are explicitly disabled.
+Updates are delivered through [Sparkle](https://sparkle-project.org/) and GitHub Releases. Both the appcast feed and every update archive are verified with an EdDSA signature before extraction. Automatic checks and automatic download and installation can be configured in Settings.
 
 Personal builds use an ad-hoc application signature and are not notarized. The initial installation therefore still requires the one-time Gatekeeper confirmation described above. Sparkle update signatures protect subsequent updates independently of an Apple Developer ID.
 
@@ -107,9 +107,10 @@ Then create a release:
 
 1. Update `CFBundleShortVersionString` and `CFBundleVersion` in `App/Info.plist`.
 2. Commit and push the change to `main`.
-3. Create and push a matching version tag, for example `v0.7.0`.
+3. Update `RELEASE_NOTES.md` so its heading matches the app version.
+4. Create and push a matching version tag, for example `v0.8.1`.
 
-The release workflow validates the tag, runs all tests, builds the app, signs the update archive and appcast, and publishes the ZIP, appcast, and SHA-256 checksum as a GitHub Release. The private update key is never written to the repository or workflow logs.
+The release workflow validates the tag and release-notes heading, runs all tests, builds the app, signs the update archive and appcast, and publishes the ZIP, appcast, release notes, and SHA-256 checksum as a GitHub Release. The private update key is never written to the repository or workflow logs.
 
 ## Project structure
 

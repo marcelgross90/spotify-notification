@@ -348,11 +348,15 @@ private struct UpdateSettingsView: View {
                     L10n.string("menu.automatic_update_checks"),
                     isOn: $model.automaticallyChecksForUpdates
                 )
+                Toggle(
+                    L10n.string("settings.updates.automatic_installation"),
+                    isOn: $model.automaticallyDownloadsUpdates
+                )
                 Button(L10n.string("menu.check_for_updates")) {
                     model.checkForUpdates()
                 }
             } footer: {
-                Text(L10n.string("settings.updates.release_notes"))
+                Text(L10n.string("settings.updates.automatic_installation.detail"))
             }
 
             Section(L10n.string("settings.updates.version")) {

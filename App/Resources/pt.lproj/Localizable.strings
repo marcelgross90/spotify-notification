@@ -83,5 +83,7 @@
 "settings.permissions.open" = "Abrir…";
 "settings.permissions.refresh" = "Atualizar estado";
 "settings.updates.release_notes" = "Novas versões mostram suas alterações diretamente na janela de atualização.";
+"settings.updates.automatic_installation" = "Transferir e instalar atualizações automaticamente";
+"settings.updates.automatic_installation.detail" = "As atualizações assinadas são transferidas automaticamente e instaladas pelo Sparkle. A pesquisa automática também é ativada.";
 "settings.updates.version" = "Versão";
 "settings.updates.installed_version" = "Instalada";
