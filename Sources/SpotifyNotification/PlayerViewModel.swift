@@ -9,6 +9,7 @@ final class PlayerViewModel {
     private(set) var errorMessage: String?
     private(set) var notificationMessage: String?
     private(set) var volume: Double = 0
+    private(set) var position: Double = 0
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
@@ -27,6 +28,7 @@ final class PlayerViewModel {
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
     private var isAdjustingVolume = false
+    private var isSeeking = false
     private var lastNonZeroVolume: Double = 50
 
     var isMuted: Bool {
@@ -75,6 +77,12 @@ final class PlayerViewModel {
                     lastNonZeroVolume = volume
                 }
             }
+            if !isSeeking {
+                position = min(
+                    max(newSnapshot.position, 0),
+                    newSnapshot.track?.duration ?? 0
+                )
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -120,6 +128,21 @@ final class PlayerViewModel {
         volume = targetVolume
         perform {
             try spotify.setVolume(Int(targetVolume.rounded()))
+        }
+    }
+
+    func updatePosition(_ newValue: Double) {
+        let duration = snapshot.track?.duration ?? 0
+        position = min(max(newValue, 0), duration)
+    }
+
+    func setPositionEditing(_ editing: Bool) {
+        isSeeking = editing
+        guard !editing else { return }
+
+        let targetPosition = position.rounded()
+        perform {
+            try spotify.seek(to: targetPosition)
         }
     }
 

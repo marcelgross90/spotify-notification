@@ -60,14 +60,69 @@ struct PlayerViewModelTests {
 
         #expect(spotify.lastSetVolume == 50)
     }
+
+    @Test
+    func commitsRoundedSeekPositionWhenEditingEnds() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.refresh()
+
+        model.updatePosition(123.6)
+        model.setPositionEditing(false)
+
+        #expect(spotify.lastSeekPosition == 124)
+    }
+
+    @Test
+    func clampsSeekPositionToTrackDuration() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.refresh()
+
+        model.updatePosition(500)
+        model.setPositionEditing(false)
+
+        #expect(spotify.lastSeekPosition == 245)
+    }
+
+    private func playingSnapshot(
+        duration: TimeInterval,
+        position: TimeInterval
+    ) -> SpotifySnapshot {
+        SpotifySnapshot(
+            isRunning: true,
+            state: .playing,
+            track: SpotifyTrack(
+                id: "track",
+                name: "Song",
+                artist: "Artist",
+                album: "Album",
+                artworkURL: nil,
+                spotifyURL: nil,
+                duration: duration
+            ),
+            position: position,
+            volume: 50
+        )
+    }
 }
 
 @MainActor
 private final class SpotifyControllerFake: SpotifyControlling {
     var lastSetVolume: Int?
+    var lastSeekPosition: TimeInterval?
+    var snapshotValue: SpotifySnapshot = .notRunning
 
     func snapshot() throws -> SpotifySnapshot {
-        .notRunning
+        snapshotValue
     }
 
     func playPause() throws {}
@@ -76,6 +131,10 @@ private final class SpotifyControllerFake: SpotifyControlling {
 
     func setVolume(_ volume: Int) throws {
         lastSetVolume = volume
+    }
+
+    func seek(to position: TimeInterval) throws {
+        lastSeekPosition = position
     }
 
     func openSpotify() {}

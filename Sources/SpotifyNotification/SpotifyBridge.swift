@@ -8,6 +8,7 @@ protocol SpotifyControlling {
     func nextTrack() throws
     func previousTrack() throws
     func setVolume(_ volume: Int) throws
+    func seek(to position: TimeInterval) throws
     func openSpotify()
     func openCurrentTrack(_ track: SpotifyTrack?)
 }
@@ -26,6 +27,7 @@ final class SpotifyBridge: SpotifyControlling {
         source: "tell application id \"com.spotify.client\" to previous track"
     )
     private var volumeScripts: [Int: NSAppleScript] = [:]
+    private var seekScripts: [Int: NSAppleScript] = [:]
 
     private static let snapshotSource = """
     tell application id "com.spotify.client"
@@ -70,6 +72,24 @@ final class SpotifyBridge: SpotifyControlling {
                 throw SpotifyBridgeError.malformedResponse
             }
             volumeScripts[clampedVolume] = newScript
+            script = newScript
+        }
+
+        try execute(script)
+    }
+
+    func seek(to position: TimeInterval) throws {
+        let targetSecond = max(0, Int(position.rounded()))
+        let script: NSAppleScript
+        if let cachedScript = seekScripts[targetSecond] {
+            script = cachedScript
+        } else {
+            guard let newScript = NSAppleScript(
+                source: "tell application id \"com.spotify.client\" to set player position to \(targetSecond)"
+            ) else {
+                throw SpotifyBridgeError.malformedResponse
+            }
+            seekScripts[targetSecond] = newScript
             script = newScript
         }
 

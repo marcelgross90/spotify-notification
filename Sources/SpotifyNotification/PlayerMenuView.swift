@@ -120,15 +120,27 @@ struct PlayerMenuView: View {
     @ViewBuilder
     private func playbackProgress(for track: SpotifyTrack) -> some View {
         if track.duration > 0 {
-            let position = min(max(model.snapshot.position, 0), track.duration)
-
             VStack(spacing: 4) {
-                ProgressView(value: position, total: track.duration)
-                    .progressViewStyle(.linear)
-                    .tint(spotifyGreen)
+                Slider(
+                    value: Binding(
+                        get: { model.position },
+                        set: { value in
+                            model.updatePosition(value)
+                        }
+                    ),
+                    in: 0...track.duration,
+                    step: 1,
+                    onEditingChanged: { editing in
+                        model.setPositionEditing(editing)
+                    }
+                )
+                .controlSize(.small)
+                .tint(spotifyGreen)
+                .accessibilityLabel("Wiedergabeposition")
+                .accessibilityValue(formattedTime(model.position))
 
                 HStack {
-                    Text(formattedTime(position))
+                    Text(formattedTime(model.position))
                     Spacer()
                     Text(formattedTime(track.duration))
                 }
