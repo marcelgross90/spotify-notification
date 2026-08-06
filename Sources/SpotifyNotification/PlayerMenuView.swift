@@ -207,7 +207,11 @@ struct PlayerMenuView: View {
 
             Divider()
 
-            Button("Spotify öffnen", action: model.openSpotify)
+            if model.snapshot.isRunning {
+                Button("In Spotify anzeigen", action: model.openCurrentTrack)
+            } else {
+                Button("Spotify öffnen", action: model.openSpotify)
+            }
             Button("Beenden", action: model.quit)
         } label: {
             Image(systemName: "ellipsis")
