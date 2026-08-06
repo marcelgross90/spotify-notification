@@ -9,6 +9,14 @@ struct SpotifyNotificationApp: App {
         let model = PlayerViewModel()
         _model = State(initialValue: model)
         model.start()
+
+        if CommandLine.arguments.contains("--preview-overlay") {
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                model.refresh()
+                model.previewOverlay()
+            }
+        }
     }
 
     var body: some Scene {
