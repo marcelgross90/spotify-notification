@@ -4,10 +4,12 @@ import SwiftUI
 @MainActor
 struct SpotifyNotificationApp: App {
     @State private var model: PlayerViewModel
+    private let shortcutService: GlobalShortcutService
 
     init() {
         let model = PlayerViewModel()
         _model = State(initialValue: model)
+        shortcutService = GlobalShortcutService(model: model)
         model.start()
     }
 
@@ -32,5 +34,9 @@ struct SpotifyNotificationApp: App {
             )
         }
         .menuBarExtraStyle(.window)
+
+        Settings {
+            SettingsView(model: model)
+        }
     }
 }

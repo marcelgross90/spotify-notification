@@ -16,6 +16,11 @@ A lightweight macOS menu bar player for the locally installed Spotify desktop ap
 - Native macOS track-change notifications with cover art
 - Optional launch at login
 - Optional current track title next to the menu bar icon
+- Configurable menu bar text format and length
+- Copy track details or the Spotify link
+- Sleep timer for a duration or the end of the current track
+- User-configurable global keyboard shortcuts without extra permissions
+- Native settings and permission status window
 - Secure in-app updates powered by Sparkle
 - Optional daily background update checks
 - Native Liquid Glass design on macOS 26 with a material fallback on older systems
@@ -120,6 +125,6 @@ scripts/                     Packaging and validation scripts
 
 Spotify Notification is available under the [MIT License](LICENSE).
 
-The bundled Sparkle framework is distributed under its own permissive license, included inside the application bundle.
+The bundled Sparkle framework and KeyboardShortcuts package are distributed under their own permissive licenses, included inside the application bundle.
 
 Spotify is a trademark of Spotify AB. This project is not affiliated with or endorsed by Spotify.

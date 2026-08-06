@@ -17,13 +17,18 @@ let package = Package(
         .package(
             url: "https://github.com/sparkle-project/Sparkle",
             exact: "2.9.5"
+        ),
+        .package(
+            url: "https://github.com/sindresorhus/KeyboardShortcuts",
+            exact: "3.0.1"
         )
     ],
     targets: [
         .executableTarget(
             name: "SpotifyNotification",
             dependencies: [
-                .product(name: "Sparkle", package: "Sparkle")
+                .product(name: "Sparkle", package: "Sparkle"),
+                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts")
             ]
         ),
         .testTarget(

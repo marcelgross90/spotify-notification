@@ -29,9 +29,16 @@ cp "$project_root/App/AppIcon.icns" "$contents_path/Resources/AppIcon.icns"
 ditto "$project_root/App/Resources" "$contents_path/Resources"
 ditto "$build_path/arm64-apple-macosx/$configuration/Sparkle.framework" \
     "$frameworks_path/Sparkle.framework"
+keyboard_shortcuts_bundle="$build_path/arm64-apple-macosx/$configuration/KeyboardShortcuts_KeyboardShortcuts.bundle"
+if [[ -d "$keyboard_shortcuts_bundle" ]]; then
+    ditto "$keyboard_shortcuts_bundle" \
+        "$contents_path/Resources/KeyboardShortcuts_KeyboardShortcuts.bundle"
+fi
 mkdir -p "$contents_path/Resources/Licenses"
 cp "$build_path/artifacts/sparkle/Sparkle/LICENSE" \
     "$contents_path/Resources/Licenses/Sparkle.txt"
+cp "$build_path/checkouts/KeyboardShortcuts/license" \
+    "$contents_path/Resources/Licenses/KeyboardShortcuts.txt"
 
 install_name_tool \
     -add_rpath "@executable_path/../Frameworks" \

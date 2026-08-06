@@ -27,6 +27,7 @@ jobs:
       - name: Package release
         id: package
         env:
+          GH_TOKEN: ${{ github.token }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           if [[ -z "$SPARKLE_PRIVATE_KEY" ]]; then
@@ -35,11 +36,19 @@ jobs:
           fi
           version="${GITHUB_REF_NAME#v}"
           archive="Spotify-Notification-$version.zip"
+          release_notes="Spotify-Notification-$version.md"
           assets_directory="release-assets"
           mkdir -p "$assets_directory"
           ditto -c -k --sequesterRsrc --keepParent \
             "dist/Spotify Notification.app" \
             "$assets_directory/$archive"
+          gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$GITHUB_REF_NAME" \
+            -f target_commitish="$GITHUB_SHA" \
+            --jq .body \
+            > "$assets_directory/$release_notes"
           printf '%s' "$SPARKLE_PRIVATE_KEY" | \
             .build/artifacts/sparkle/Sparkle/bin/generate_appcast \
               --ed-key-file - \
@@ -51,14 +60,17 @@ jobs:
           shasum -a 256 "$assets_directory/$archive" \
             > "$assets_directory/$archive.sha256"
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "release_notes=$release_notes" >> "$GITHUB_OUTPUT"
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           archive="${{ steps.package.outputs.archive }}"
+          release_notes="${{ steps.package.outputs.release_notes }}"
           gh release create "$GITHUB_REF_NAME" \
             "release-assets/$archive" \
             "release-assets/$archive.sha256" \
             "release-assets/appcast.xml" \
+            "release-assets/$release_notes" \
             --title "Spotify Notification $GITHUB_REF_NAME" \
-            --generate-notes
+            --notes-file "release-assets/$release_notes"

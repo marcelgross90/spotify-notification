@@ -1,7 +1,9 @@
+import AppKit
 import SwiftUI
 
 struct PlayerMenuView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openSettings) private var openSettings
     @Bindable var model: PlayerViewModel
     private let spotifyGreen = Color(red: 0.114, green: 0.725, blue: 0.329)
 
@@ -18,11 +20,27 @@ struct PlayerMenuView: View {
                     statusMessage(notificationMessage, color: .orange)
                 }
 
+                if let actionMessage = model.actionMessage {
+                    statusMessage(
+                        actionMessage,
+                        color: spotifyGreen,
+                        systemImage: "checkmark.circle.fill"
+                    )
+                }
             }
             .padding(22)
         }
         .padding(10)
         .frame(width: 390)
+        .background {
+            Button(action: openSettingsWindow) {
+                Color.clear
+                    .frame(width: 1, height: 1)
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut(",", modifiers: .command)
+            .accessibilityHidden(true)
+        }
     }
 
     @ViewBuilder
@@ -217,35 +235,46 @@ struct PlayerMenuView: View {
 
     private var optionsMenu: some View {
         Menu {
-            Toggle(
-                L10n.string("menu.track_notifications"),
-                isOn: $model.notificationsEnabled
-            )
-            Toggle(
-                L10n.string("menu.launch_at_login"),
-                isOn: Binding(
-                    get: { model.launchAtLoginEnabled },
-                    set: { enabled in
-                        model.setLaunchAtLogin(enabled)
+            Menu {
+                Button(L10n.string("menu.copy.track"), action: model.copyTrackDetails)
+                    .disabled(model.snapshot.track == nil)
+                Button(L10n.string("menu.copy.link"), action: model.copySpotifyLink)
+                    .disabled(model.snapshot.track?.spotifyURL == nil)
+            } label: {
+                Label(L10n.string("menu.copy"), systemImage: "doc.on.doc")
+            }
+
+            Menu {
+                ForEach([15, 30, 45, 60], id: \.self) { minutes in
+                    Button(L10n.format("menu.sleep_timer.minutes", minutes)) {
+                        model.startSleepTimer(minutes: minutes)
                     }
+                }
+
+                Button(
+                    L10n.string("menu.sleep_timer.end_of_track"),
+                    action: model.startSleepTimerAfterCurrentTrack
                 )
-            )
-            Toggle(
-                L10n.string("menu.show_track_in_menu_bar"),
-                isOn: $model.showTrackInMenuBar
-            )
+                .disabled(model.snapshot.track == nil)
+
+                if model.sleepTimer != nil {
+                    Divider()
+                    Text(sleepTimerStatus)
+                    Button(
+                        L10n.string("menu.sleep_timer.cancel"),
+                        action: model.cancelSleepTimer
+                    )
+                }
+            } label: {
+                Label(L10n.string("menu.sleep_timer"), systemImage: "moon.zzz")
+            }
 
             Divider()
 
-            Text(L10n.format("menu.version", model.appVersion, model.appBuild))
-            Toggle(
-                L10n.string("menu.automatic_update_checks"),
-                isOn: $model.automaticallyChecksForUpdates
-            )
-            Button(
-                L10n.string("menu.check_for_updates"),
-                action: checkForUpdates
-            )
+            Button(action: openSettingsWindow) {
+                Label(L10n.string("menu.settings"), systemImage: "gearshape")
+            }
+            .keyboardShortcut(",", modifiers: .command)
 
             Divider()
 
@@ -263,12 +292,27 @@ struct PlayerMenuView: View {
         .help(L10n.string("menu.more_options"))
     }
 
-    private func checkForUpdates() {
+    private var sleepTimerStatus: String {
+        switch model.sleepTimer {
+        case .endOfTrack:
+            L10n.string("menu.sleep_timer.active_end_of_track")
+        case .deadline:
+            L10n.format(
+                "menu.sleep_timer.active_minutes",
+                model.sleepTimerRemainingMinutes() ?? 1
+            )
+        case nil:
+            ""
+        }
+    }
+
+    private func openSettingsWindow() {
         dismiss()
 
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(150))
-            model.checkForUpdates()
+            NSApp.activate(ignoringOtherApps: true)
+            openSettings()
         }
     }
 
@@ -294,8 +338,12 @@ struct PlayerMenuView: View {
         }
     }
 
-    private func statusMessage(_ message: String, color: Color) -> some View {
-        Label(message, systemImage: "exclamationmark.circle.fill")
+    private func statusMessage(
+        _ message: String,
+        color: Color,
+        systemImage: String = "exclamationmark.circle.fill"
+    ) -> some View {
+        Label(message, systemImage: systemImage)
             .font(.caption)
             .foregroundStyle(color)
             .fixedSize(horizontal: false, vertical: true)

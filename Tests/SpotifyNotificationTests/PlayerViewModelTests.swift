@@ -247,6 +247,71 @@ struct PlayerViewModelTests {
         #expect(model.menuBarTitle == nil)
     }
 
+    @Test
+    func formatsArtistAndTrackForMenuBar() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake(),
+            menuBarDisplayMode: .artistAndTitle
+        )
+
+        model.refresh()
+
+        #expect(model.menuBarTitle == "Artist — Song")
+    }
+
+    @Test
+    func sleepTimerPausesPlaybackAfterDeadline() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        let start = Date(timeIntervalSince1970: 1_000)
+        model.refresh(at: start)
+        model.startSleepTimer(minutes: 15, now: start)
+
+        model.refresh(at: start.addingTimeInterval(901))
+
+        #expect(spotify.playPauseCount == 1)
+        #expect(model.sleepTimer == nil)
+    }
+
+    @Test
+    func endOfTrackSleepTimerPausesWhenTrackChanges() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake()
+        )
+        model.refresh()
+        model.startSleepTimerAfterCurrentTrack()
+        spotify.snapshotValue = SpotifySnapshot(
+            isRunning: true,
+            state: .playing,
+            track: SpotifyTrack(
+                id: "next-track",
+                name: "Next Song",
+                artist: "Artist",
+                album: "Album",
+                artworkURL: nil,
+                spotifyURL: nil,
+                duration: 200
+            ),
+            position: 0,
+            volume: 50
+        )
+
+        model.refresh()
+
+        #expect(spotify.playPauseCount == 1)
+        #expect(model.sleepTimer == nil)
+    }
+
     private func playingSnapshot(
         duration: TimeInterval,
         position: TimeInterval,
@@ -283,13 +348,16 @@ private final class SpotifyControllerFake: SpotifyControlling {
     var lastSeekPosition: TimeInterval?
     var lastShuffleState: Bool?
     var lastRepeatState: Bool?
+    var playPauseCount = 0
     var snapshotValue: SpotifySnapshot = .notRunning
 
     func snapshot() throws -> SpotifySnapshot {
         snapshotValue
     }
 
-    func playPause() throws {}
+    func playPause() throws {
+        playPauseCount += 1
+    }
     func nextTrack() throws {}
     func previousTrack() throws {}
 
