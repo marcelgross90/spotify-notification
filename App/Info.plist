@@ -17,9 +17,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.6.0</string>
+    <string>0.7.0</string>
     <key>CFBundleVersion</key>
-    <string>16</string>
+    <string>17</string>
     <key>CFBundleLocalizations</key>
     <array>
         <string>de</string>
@@ -38,5 +38,21 @@
     <string>Spotify Notification reads the current track and controls local Spotify playback.</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Marcel Groß</string>
+    <key>SUAllowsAutomaticUpdates</key>
+    <false/>
+    <key>SUAutomaticallyUpdate</key>
+    <false/>
+    <key>SUEnableAutomaticChecks</key>
+    <false/>
+    <key>SUFeedURL</key>
+    <string>https://github.com/marcelgross90/spotify-notification/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>Q9XgfLMgQnxsRddGBMWQ3M9OIU4+1spSUZ0K2VnyON8=</string>
+    <key>SURequireSignedFeed</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
+    <key>SUVerifyUpdateBeforeExtraction</key>
+    <true/>
 </dict>
 </plist>

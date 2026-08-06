@@ -16,7 +16,8 @@ A lightweight macOS menu bar player for the locally installed Spotify desktop ap
 - Native macOS track-change notifications with cover art
 - Optional launch at login
 - Optional current track title next to the menu bar icon
-- Manual update checks through GitHub Releases
+- Secure in-app updates powered by Sparkle
+- Optional daily background update checks
 - Native Liquid Glass design on macOS 26 with a material fallback on older systems
 - No Spotify OAuth, cloud storage, analytics, statistics, or telemetry
 
@@ -52,9 +53,11 @@ The app runs only in the menu bar and does not add an icon to the Dock.
 
 ## Updates
 
-Open the three-dot menu and select **Check for updates**. The app queries the public GitHub Releases API and reports whether a newer version exists. If an update is available, the release page can be opened directly to review and download it.
+Open the three-dot menu and select **Check for updates**. If a signed update is available, the app shows its release information and can download, install, and relaunch itself after confirmation. Automatic daily checks are optional and disabled by default.
 
-No GitHub token or background update service is used.
+Updates are delivered through [Sparkle](https://sparkle-project.org/) and GitHub Releases. Both the appcast feed and every update archive are verified with an EdDSA signature before extraction. Silent automatic downloads are explicitly disabled.
+
+Personal builds use an ad-hoc application signature and are not notarized. The initial installation therefore still requires the one-time Gatekeeper confirmation described above. Sparkle update signatures protect subsequent updates independently of an Apple Developer ID.
 
 ## Privacy
 
@@ -62,7 +65,7 @@ Spotify Notification communicates only with:
 
 - the locally installed Spotify app through Apple's Automation interface;
 - Spotify's cover-art URL when artwork is displayed or attached to a notification;
-- the public GitHub Releases API when an update check is requested.
+- the signed update feed and archive hosted on GitHub Releases when an update check is requested or enabled in the background.
 
 No listening history, account information, or usage data is collected or stored.
 
@@ -87,11 +90,21 @@ The packaging script applies an ad-hoc code signature suitable for personal use.
 
 ## Creating a release
 
+Before the first release, configure the private Sparkle key as a GitHub Actions secret. The key remains in the local macOS Keychain and is exported only to GitHub's encrypted secret storage:
+
+```sh
+brew install gh
+gh auth login
+./scripts/configure-sparkle-secret.sh
+```
+
+Then create a release:
+
 1. Update `CFBundleShortVersionString` and `CFBundleVersion` in `App/Info.plist`.
 2. Commit and push the change to `main`.
-3. Create and push a matching version tag, for example `v0.6.0`.
+3. Create and push a matching version tag, for example `v0.7.0`.
 
-The release workflow validates the tag, runs all tests, builds the app, creates a ZIP and SHA-256 checksum, and publishes both files as a GitHub Release.
+The release workflow validates the tag, runs all tests, builds the app, signs the update archive and appcast, and publishes the ZIP, appcast, and SHA-256 checksum as a GitHub Release. The private update key is never written to the repository or workflow logs.
 
 ## Project structure
 
@@ -106,5 +119,7 @@ scripts/                     Packaging and validation scripts
 ## License
 
 Spotify Notification is available under the [MIT License](LICENSE).
+
+The bundled Sparkle framework is distributed under its own permissive license, included inside the application bundle.
 
 Spotify is a trademark of Spotify AB. This project is not affiliated with or endorsed by Spotify.

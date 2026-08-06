@@ -26,7 +26,7 @@
 "menu.show_track_in_menu_bar" = "Show track in menu bar";
 "menu.version" = "Version %@";
 "menu.check_for_updates" = "Check for updates";
-"menu.checking_updates" = "Checking for updates…";
+"menu.automatic_update_checks" = "Automatically check for updates";
 "menu.quit" = "Quit";
 "menu.more_options" = "More options";
 "error.launch_at_login" = "Launch at login could not be changed: %@";
@@ -36,9 +36,3 @@
 "error.spotify.malformed_response" = "Spotify returned unexpected playback data.";
 "error.spotify.script" = "Spotify could not be queried: %@";
 "error.spotify.unknown_applescript" = "Unknown AppleScript error";
-"update.error.unavailable" = "No published release is available yet.";
-"update.error.invalid_release" = "GitHub returned invalid release data.";
-"update.status.current" = "Version %@ is up to date.";
-"update.status.available" = "Version %@ is available.";
-"update.status.failed" = "Update check failed: %@";
-"update.open_release" = "Open release";

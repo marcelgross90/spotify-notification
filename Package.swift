@@ -13,9 +13,18 @@ let package = Package(
             targets: ["SpotifyNotification"]
         )
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/sparkle-project/Sparkle",
+            exact: "2.9.5"
+        )
+    ],
     targets: [
         .executableTarget(
-            name: "SpotifyNotification"
+            name: "SpotifyNotification",
+            dependencies: [
+                .product(name: "Sparkle", package: "Sparkle")
+            ]
         ),
         .testTarget(
             name: "SpotifyNotificationTests",

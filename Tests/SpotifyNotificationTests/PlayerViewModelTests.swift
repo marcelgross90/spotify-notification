@@ -175,26 +175,32 @@ struct PlayerViewModelTests {
     }
 
     @Test
-    func exposesAvailableUpdateFromUpdateChecker() async {
-        let releaseURL = URL(
-            string: "https://github.com/marcelgross90/spotify-notification/releases/tag/v0.6.0"
-        )!
+    func forwardsManualUpdateCheckToUpdater() {
+        let updater = AppUpdaterFake()
         let model = PlayerViewModel(
             spotify: SpotifyControllerFake(),
             notifier: TrackNotifierFake(),
-            updateChecker: UpdateCheckerFake(
-                result: .updateAvailable(version: "0.6.0", releaseURL: releaseURL)
-            ),
+            updateController: updater,
             appVersion: "0.5.0"
         )
 
         model.checkForUpdates()
-        while model.isCheckingForUpdates {
-            await Task.yield()
-        }
 
-        #expect(model.availableUpdateURL == releaseURL)
-        #expect(model.updateMessage != nil)
+        #expect(updater.checkCount == 1)
+    }
+
+    @Test
+    func changesAutomaticUpdateChecksThroughUpdater() {
+        let updater = AppUpdaterFake()
+        let model = PlayerViewModel(
+            spotify: SpotifyControllerFake(),
+            notifier: TrackNotifierFake(),
+            updateController: updater
+        )
+
+        model.automaticallyChecksForUpdates = true
+
+        #expect(updater.automaticallyChecksForUpdates)
     }
 
     @Test
@@ -302,10 +308,12 @@ private final class TrackNotifierFake: TrackNotifying {
     func notify(track: SpotifyTrack) async {}
 }
 
-private struct UpdateCheckerFake: UpdateChecking {
-    let result: UpdateCheckResult
+@MainActor
+private final class AppUpdaterFake: AppUpdating {
+    var automaticallyChecksForUpdates = false
+    var checkCount = 0
 
-    func check(currentVersion: String) async throws -> UpdateCheckResult {
-        result
+    func checkForUpdates() {
+        checkCount += 1
     }
 }

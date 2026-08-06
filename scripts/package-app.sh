@@ -7,6 +7,9 @@ configuration="${1:-release}"
 build_path="$project_root/.build"
 app_path="$project_root/dist/Spotify Notification.app"
 contents_path="$app_path/Contents"
+frameworks_path="$contents_path/Frameworks"
+
+rm -rf "$app_path"
 
 swift build \
     --package-path "$project_root" \
@@ -19,11 +22,20 @@ binary_path="$(swift build \
     --configuration "$configuration" \
     --show-bin-path)/SpotifyNotification"
 
-mkdir -p "$contents_path/MacOS" "$contents_path/Resources"
+mkdir -p "$contents_path/MacOS" "$contents_path/Resources" "$frameworks_path"
 cp "$binary_path" "$contents_path/MacOS/SpotifyNotification"
 cp "$project_root/App/Info.plist" "$contents_path/Info.plist"
 cp "$project_root/App/AppIcon.icns" "$contents_path/Resources/AppIcon.icns"
 ditto "$project_root/App/Resources" "$contents_path/Resources"
+ditto "$build_path/arm64-apple-macosx/$configuration/Sparkle.framework" \
+    "$frameworks_path/Sparkle.framework"
+mkdir -p "$contents_path/Resources/Licenses"
+cp "$build_path/artifacts/sparkle/Sparkle/LICENSE" \
+    "$contents_path/Resources/Licenses/Sparkle.txt"
+
+install_name_tool \
+    -add_rpath "@executable_path/../Frameworks" \
+    "$contents_path/MacOS/SpotifyNotification"
 
 codesign --force --deep --sign - "$app_path"
 

@@ -26,7 +26,7 @@
 "menu.show_track_in_menu_bar" = "Titel in der Menüleiste anzeigen";
 "menu.version" = "Version %@";
 "menu.check_for_updates" = "Nach Updates suchen";
-"menu.checking_updates" = "Suche nach Updates…";
+"menu.automatic_update_checks" = "Automatisch nach Updates suchen";
 "menu.quit" = "Beenden";
 "menu.more_options" = "Weitere Optionen";
 "error.launch_at_login" = "Autostart konnte nicht geändert werden: %@";
@@ -36,9 +36,3 @@
 "error.spotify.malformed_response" = "Spotify hat unerwartete Wiedergabedaten geliefert.";
 "error.spotify.script" = "Spotify konnte nicht abgefragt werden: %@";
 "error.spotify.unknown_applescript" = "Unbekannter AppleScript-Fehler";
-"update.error.unavailable" = "Es wurde noch kein Release veröffentlicht.";
-"update.error.invalid_release" = "GitHub hat ungültige Release-Daten geliefert.";
-"update.status.current" = "Version %@ ist aktuell.";
-"update.status.available" = "Version %@ ist verfügbar.";
-"update.status.failed" = "Update-Prüfung fehlgeschlagen: %@";
-"update.open_release" = "Release öffnen";

@@ -17,9 +17,6 @@ struct PlayerMenuView: View {
                     statusMessage(notificationMessage, color: .orange)
                 }
 
-                if let updateMessage = model.updateMessage {
-                    updateStatusMessage(updateMessage)
-                }
             }
             .padding(22)
         }
@@ -240,13 +237,16 @@ struct PlayerMenuView: View {
             Divider()
 
             Text(L10n.format("menu.version", model.appVersion))
-            Button(
-                model.isCheckingForUpdates
-                    ? L10n.string("menu.checking_updates")
-                    : L10n.string("menu.check_for_updates"),
-                action: model.checkForUpdates
+            Toggle(
+                L10n.string("menu.automatic_update_checks"),
+                isOn: Binding(
+                    get: { model.automaticallyChecksForUpdates },
+                    set: { enabled in
+                        model.automaticallyChecksForUpdates = enabled
+                    }
+                )
             )
-            .disabled(model.isCheckingForUpdates)
+            Button(L10n.string("menu.check_for_updates"), action: model.checkForUpdates)
 
             Divider()
 
@@ -291,23 +291,6 @@ struct PlayerMenuView: View {
             .font(.caption)
             .foregroundStyle(color)
             .fixedSize(horizontal: false, vertical: true)
-    }
-
-    private func updateStatusMessage(_ message: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Label(message, systemImage: "arrow.triangle.2.circlepath.circle.fill")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 0)
-
-            if model.availableUpdateURL != nil {
-                Button(L10n.string("update.open_release"), action: model.openAvailableUpdate)
-                    .buttonStyle(.link)
-                    .font(.caption)
-            }
-        }
     }
 
     private func formattedTime(_ seconds: TimeInterval) -> String {

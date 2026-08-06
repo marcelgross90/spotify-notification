@@ -11,9 +11,6 @@ final class PlayerViewModel {
     private(set) var volume: Double = 0
     private(set) var position: Double = 0
     private(set) var isSeeking = false
-    private(set) var isCheckingForUpdates = false
-    private(set) var updateMessage: String?
-    private(set) var availableUpdateURL: URL?
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
@@ -36,7 +33,7 @@ final class PlayerViewModel {
     private static let maximumMenuBarTitleLength = 36
     private let spotify: SpotifyControlling
     private let notifier: TrackNotifying
-    private let updateChecker: any UpdateChecking
+    private let updateController: any AppUpdating
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
     private var isAdjustingVolume = false
@@ -45,6 +42,11 @@ final class PlayerViewModel {
 
     var isMuted: Bool {
         volume == 0
+    }
+
+    var automaticallyChecksForUpdates: Bool {
+        get { updateController.automaticallyChecksForUpdates }
+        set { updateController.automaticallyChecksForUpdates = newValue }
     }
 
     var menuBarTitle: String? {
@@ -66,7 +68,7 @@ final class PlayerViewModel {
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
         notifier: TrackNotifying = TrackNotificationService(),
-        updateChecker: any UpdateChecking = GitHubUpdateService(),
+        updateController: any AppUpdating = SparkleUpdateController(),
         appVersion: String = Bundle.main.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
         ) as? String ?? "0.0.0",
@@ -74,7 +76,7 @@ final class PlayerViewModel {
     ) {
         self.spotify = spotify
         self.notifier = notifier
-        self.updateChecker = updateChecker
+        self.updateController = updateController
         self.appVersion = appVersion
         self.showTrackInMenuBar = showTrackInMenuBar
             ?? UserDefaults.standard.bool(forKey: Self.menuBarTrackKey)
@@ -229,31 +231,7 @@ final class PlayerViewModel {
     }
 
     func checkForUpdates() {
-        guard !isCheckingForUpdates else { return }
-
-        isCheckingForUpdates = true
-        updateMessage = nil
-        availableUpdateURL = nil
-
-        Task {
-            do {
-                switch try await updateChecker.check(currentVersion: appVersion) {
-                case .upToDate:
-                    updateMessage = L10n.format("update.status.current", appVersion)
-                case let .updateAvailable(version, releaseURL):
-                    updateMessage = L10n.format("update.status.available", version)
-                    availableUpdateURL = releaseURL
-                }
-            } catch {
-                updateMessage = L10n.format("update.status.failed", error.localizedDescription)
-            }
-            isCheckingForUpdates = false
-        }
-    }
-
-    func openAvailableUpdate() {
-        guard let availableUpdateURL else { return }
-        NSWorkspace.shared.open(availableUpdateURL)
+        updateController.checkForUpdates()
     }
 
     func quit() {

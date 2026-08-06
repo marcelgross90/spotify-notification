@@ -26,11 +26,30 @@ jobs:
         run: make app
       - name: Package release
         id: package
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
+          if [[ -z "$SPARKLE_PRIVATE_KEY" ]]; then
+            echo "The SPARKLE_PRIVATE_KEY repository secret is missing." >&2
+            exit 1
+          fi
           version="${GITHUB_REF_NAME#v}"
           archive="Spotify-Notification-$version.zip"
-          ditto -c -k --sequesterRsrc --keepParent "dist/Spotify Notification.app" "$archive"
-          shasum -a 256 "$archive" > "$archive.sha256"
+          assets_directory="release-assets"
+          mkdir -p "$assets_directory"
+          ditto -c -k --sequesterRsrc --keepParent \
+            "dist/Spotify Notification.app" \
+            "$assets_directory/$archive"
+          printf '%s' "$SPARKLE_PRIVATE_KEY" | \
+            .build/artifacts/sparkle/Sparkle/bin/generate_appcast \
+              --ed-key-file - \
+              --download-url-prefix \
+                "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/" \
+              --link "https://github.com/$GITHUB_REPOSITORY" \
+              -o "$assets_directory/appcast.xml" \
+              "$assets_directory"
+          shasum -a 256 "$assets_directory/$archive" \
+            > "$assets_directory/$archive.sha256"
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
       - name: Publish GitHub release
         env:
@@ -38,7 +57,8 @@ jobs:
         run: |
           archive="${{ steps.package.outputs.archive }}"
           gh release create "$GITHUB_REF_NAME" \
-            "$archive" \
-            "$archive.sha256" \
+            "release-assets/$archive" \
+            "release-assets/$archive.sha256" \
+            "release-assets/appcast.xml" \
             --title "Spotify Notification $GITHUB_REF_NAME" \
             --generate-notes

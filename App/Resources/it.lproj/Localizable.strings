@@ -26,7 +26,7 @@
 "menu.show_track_in_menu_bar" = "Mostra brano nella barra dei menu";
 "menu.version" = "Versione %@";
 "menu.check_for_updates" = "Cerca aggiornamenti";
-"menu.checking_updates" = "Ricerca aggiornamenti…";
+"menu.automatic_update_checks" = "Cerca aggiornamenti automaticamente";
 "menu.quit" = "Esci";
 "menu.more_options" = "Altre opzioni";
 "error.launch_at_login" = "Impossibile modificare l’apertura al login: %@";
@@ -36,9 +36,3 @@
 "error.spotify.malformed_response" = "Spotify ha restituito dati di riproduzione imprevisti.";
 "error.spotify.script" = "Impossibile interrogare Spotify: %@";
 "error.spotify.unknown_applescript" = "Errore AppleScript sconosciuto";
-"update.error.unavailable" = "Non è ancora stata pubblicata alcuna versione.";
-"update.error.invalid_release" = "GitHub ha restituito dati di versione non validi.";
-"update.status.current" = "La versione %@ è aggiornata.";
-"update.status.available" = "È disponibile la versione %@.";
-"update.status.failed" = "Ricerca aggiornamenti non riuscita: %@";
-"update.open_release" = "Apri versione";

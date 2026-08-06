@@ -26,7 +26,7 @@
 "menu.show_track_in_menu_bar" = "Afficher le titre dans la barre des menus";
 "menu.version" = "Version %@";
 "menu.check_for_updates" = "Rechercher des mises à jour";
-"menu.checking_updates" = "Recherche de mises à jour…";
+"menu.automatic_update_checks" = "Rechercher automatiquement les mises à jour";
 "menu.quit" = "Quitter";
 "menu.more_options" = "Plus d’options";
 "error.launch_at_login" = "L’ouverture à la connexion n’a pas pu être modifiée : %@";
@@ -36,9 +36,3 @@
 "error.spotify.malformed_response" = "Spotify a renvoyé des données de lecture inattendues.";
 "error.spotify.script" = "Impossible d’interroger Spotify : %@";
 "error.spotify.unknown_applescript" = "Erreur AppleScript inconnue";
-"update.error.unavailable" = "Aucune version n’a encore été publiée.";
-"update.error.invalid_release" = "GitHub a renvoyé des données de version non valides.";
-"update.status.current" = "La version %@ est à jour.";
-"update.status.available" = "La version %@ est disponible.";
-"update.status.failed" = "La recherche de mise à jour a échoué : %@";
-"update.open_release" = "Ouvrir la version";

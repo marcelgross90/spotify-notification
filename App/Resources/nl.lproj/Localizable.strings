@@ -26,7 +26,7 @@
 "menu.show_track_in_menu_bar" = "Toon nummer in menubalk";
 "menu.version" = "Versie %@";
 "menu.check_for_updates" = "Zoek naar updates";
-"menu.checking_updates" = "Zoeken naar updates…";
+"menu.automatic_update_checks" = "Automatisch naar updates zoeken";
 "menu.quit" = "Stop";
 "menu.more_options" = "Meer opties";
 "error.launch_at_login" = "Openen bij inloggen kon niet worden gewijzigd: %@";
@@ -36,9 +36,3 @@
 "error.spotify.malformed_response" = "Spotify heeft onverwachte afspeelgegevens geretourneerd.";
 "error.spotify.script" = "Spotify kon niet worden opgevraagd: %@";
 "error.spotify.unknown_applescript" = "Onbekende AppleScript-fout";
-"update.error.unavailable" = "Er is nog geen release gepubliceerd.";
-"update.error.invalid_release" = "GitHub heeft ongeldige releasegegevens geretourneerd.";
-"update.status.current" = "Versie %@ is actueel.";
-"update.status.available" = "Versie %@ is beschikbaar.";
-"update.status.failed" = "Controleren op updates mislukt: %@";
-"update.open_release" = "Open release";
