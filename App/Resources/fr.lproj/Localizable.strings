@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Notifications de changement de titre";
 "menu.launch_at_login" = "Ouvrir à la connexion";
 "menu.show_track_in_menu_bar" = "Afficher le titre dans la barre des menus";
-"menu.version" = "Version %@";
+"menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Rechercher des mises à jour";
 "menu.automatic_update_checks" = "Rechercher automatiquement les mises à jour";
 "menu.quit" = "Quitter";

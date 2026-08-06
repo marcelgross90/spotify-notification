@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Notifiche cambio brano";
 "menu.launch_at_login" = "Apri al login";
 "menu.show_track_in_menu_bar" = "Mostra brano nella barra dei menu";
-"menu.version" = "Versione %@";
+"menu.version" = "Versione %@ (%@)";
 "menu.check_for_updates" = "Cerca aggiornamenti";
 "menu.automatic_update_checks" = "Cerca aggiornamenti automaticamente";
 "menu.quit" = "Esci";

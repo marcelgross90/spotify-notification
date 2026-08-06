@@ -236,7 +236,7 @@ struct PlayerMenuView: View {
 
             Divider()
 
-            Text(L10n.format("menu.version", model.appVersion))
+            Text(L10n.format("menu.version", model.appVersion, model.appBuild))
             Toggle(
                 L10n.string("menu.automatic_update_checks"),
                 isOn: Binding(

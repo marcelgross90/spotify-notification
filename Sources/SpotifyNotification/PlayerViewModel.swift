@@ -64,6 +64,7 @@ final class PlayerViewModel {
     }
 
     let appVersion: String
+    let appBuild: String
 
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
@@ -72,12 +73,16 @@ final class PlayerViewModel {
         appVersion: String = Bundle.main.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
         ) as? String ?? "0.0.0",
+        appBuild: String = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleVersion"
+        ) as? String ?? "0",
         showTrackInMenuBar: Bool? = nil
     ) {
         self.spotify = spotify
         self.notifier = notifier
         self.updateController = updateController
         self.appVersion = appVersion
+        self.appBuild = appBuild
         self.showTrackInMenuBar = showTrackInMenuBar
             ?? UserDefaults.standard.bool(forKey: Self.menuBarTrackKey)
         if UserDefaults.standard.object(forKey: Self.notificationsKey) == nil {

@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Notificações de mudança de faixa";
 "menu.launch_at_login" = "Abrir ao iniciar sessão";
 "menu.show_track_in_menu_bar" = "Mostrar faixa na barra de menus";
-"menu.version" = "Versão %@";
+"menu.version" = "Versão %@ (%@)";
 "menu.check_for_updates" = "Verificar atualizações";
 "menu.automatic_update_checks" = "Verificar atualizações automaticamente";
 "menu.quit" = "Sair";

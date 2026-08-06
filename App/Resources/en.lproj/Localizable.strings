@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Track change notifications";
 "menu.launch_at_login" = "Open at login";
 "menu.show_track_in_menu_bar" = "Show track in menu bar";
-"menu.version" = "Version %@";
+"menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Check for updates";
 "menu.automatic_update_checks" = "Automatically check for updates";
 "menu.quit" = "Quit";

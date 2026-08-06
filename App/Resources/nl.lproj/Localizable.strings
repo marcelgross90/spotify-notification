@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Meldingen bij nummerwissel";
 "menu.launch_at_login" = "Open bij inloggen";
 "menu.show_track_in_menu_bar" = "Toon nummer in menubalk";
-"menu.version" = "Versie %@";
+"menu.version" = "Versie %@ (%@)";
 "menu.check_for_updates" = "Zoek naar updates";
 "menu.automatic_update_checks" = "Automatisch naar updates zoeken";
 "menu.quit" = "Stop";

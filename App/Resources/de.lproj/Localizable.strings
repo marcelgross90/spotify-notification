@@ -24,7 +24,7 @@
 "menu.track_notifications" = "Titelwechsel-Mitteilungen";
 "menu.launch_at_login" = "Beim Anmelden öffnen";
 "menu.show_track_in_menu_bar" = "Titel in der Menüleiste anzeigen";
-"menu.version" = "Version %@";
+"menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Nach Updates suchen";
 "menu.automatic_update_checks" = "Automatisch nach Updates suchen";
 "menu.quit" = "Beenden";
