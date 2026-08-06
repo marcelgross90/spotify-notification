@@ -26,7 +26,8 @@
 "menu.show_track_in_menu_bar" = "Titel in der Menüleiste anzeigen";
 "menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Nach Updates suchen";
-"menu.automatic_update_checks" = "Automatisch nach Updates suchen";
+"menu.automatic_update_checks.enabled" = "Automatische Update-Suche: Ein";
+"menu.automatic_update_checks.disabled" = "Automatische Update-Suche: Aus";
 "menu.quit" = "Beenden";
 "menu.more_options" = "Weitere Optionen";
 "error.launch_at_login" = "Autostart konnte nicht geändert werden: %@";

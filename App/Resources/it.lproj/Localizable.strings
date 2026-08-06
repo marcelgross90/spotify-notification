@@ -26,7 +26,8 @@
 "menu.show_track_in_menu_bar" = "Mostra brano nella barra dei menu";
 "menu.version" = "Versione %@ (%@)";
 "menu.check_for_updates" = "Cerca aggiornamenti";
-"menu.automatic_update_checks" = "Cerca aggiornamenti automaticamente";
+"menu.automatic_update_checks.enabled" = "Ricerca automatica aggiornamenti: Attiva";
+"menu.automatic_update_checks.disabled" = "Ricerca automatica aggiornamenti: Disattiva";
 "menu.quit" = "Esci";
 "menu.more_options" = "Altre opzioni";
 "error.launch_at_login" = "Impossibile modificare l’apertura al login: %@";

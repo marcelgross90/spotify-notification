@@ -26,7 +26,8 @@
 "menu.show_track_in_menu_bar" = "Mostrar faixa na barra de menus";
 "menu.version" = "Versão %@ (%@)";
 "menu.check_for_updates" = "Verificar atualizações";
-"menu.automatic_update_checks" = "Verificar atualizações automaticamente";
+"menu.automatic_update_checks.enabled" = "Verificação automática de atualizações: Ativada";
+"menu.automatic_update_checks.disabled" = "Verificação automática de atualizações: Desativada";
 "menu.quit" = "Sair";
 "menu.more_options" = "Mais opções";
 "error.launch_at_login" = "Não foi possível alterar a abertura ao iniciar sessão: %@";

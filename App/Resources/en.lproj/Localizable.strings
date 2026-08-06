@@ -26,7 +26,8 @@
 "menu.show_track_in_menu_bar" = "Show track in menu bar";
 "menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Check for updates";
-"menu.automatic_update_checks" = "Automatically check for updates";
+"menu.automatic_update_checks.enabled" = "Automatic update checks: On";
+"menu.automatic_update_checks.disabled" = "Automatic update checks: Off";
 "menu.quit" = "Quit";
 "menu.more_options" = "More options";
 "error.launch_at_login" = "Launch at login could not be changed: %@";
