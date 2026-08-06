@@ -15,6 +15,7 @@ A lightweight macOS menu bar player for the locally installed Spotify desktop ap
 - Shuffle and context repeat when supported by the current Spotify playback context
 - Native macOS track-change notifications with cover art
 - Optional launch at login
+- Optional current track title next to the menu bar icon
 - Manual update checks through GitHub Releases
 - Native Liquid Glass design on macOS 26 with a material fallback on older systems
 - No Spotify OAuth, cloud storage, analytics, statistics, or telemetry
@@ -88,7 +89,7 @@ The packaging script applies an ad-hoc code signature suitable for personal use.
 
 1. Update `CFBundleShortVersionString` and `CFBundleVersion` in `App/Info.plist`.
 2. Commit and push the change to `main`.
-3. Create and push a matching version tag, for example `v0.5.0`.
+3. Create and push a matching version tag, for example `v0.6.0`.
 
 The release workflow validates the tag, runs all tests, builds the app, creates a ZIP and SHA-256 checksum, and publishes both files as a GitHub Release.
 

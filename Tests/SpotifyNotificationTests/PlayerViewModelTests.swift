@@ -197,6 +197,36 @@ struct PlayerViewModelTests {
         #expect(model.updateMessage != nil)
     }
 
+    @Test
+    func exposesCurrentTrackForMenuBarWhenEnabled() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake(),
+            showTrackInMenuBar: true
+        )
+
+        model.refresh()
+
+        #expect(model.menuBarTitle == "Song")
+    }
+
+    @Test
+    func hidesCurrentTrackForMenuBarWhenDisabled() {
+        let spotify = SpotifyControllerFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: TrackNotifierFake(),
+            showTrackInMenuBar: false
+        )
+
+        model.refresh()
+
+        #expect(model.menuBarTitle == nil)
+    }
+
     private func playingSnapshot(
         duration: TimeInterval,
         position: TimeInterval,

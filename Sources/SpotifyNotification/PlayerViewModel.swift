@@ -24,9 +24,16 @@ final class PlayerViewModel {
             }
         }
     }
+    var showTrackInMenuBar: Bool {
+        didSet {
+            UserDefaults.standard.set(showTrackInMenuBar, forKey: Self.menuBarTrackKey)
+        }
+    }
     var launchAtLoginEnabled: Bool = LaunchAtLoginService.isEnabled
 
     private static let notificationsKey = "notificationsEnabled"
+    private static let menuBarTrackKey = "showTrackInMenuBar"
+    private static let maximumMenuBarTitleLength = 36
     private let spotify: SpotifyControlling
     private let notifier: TrackNotifying
     private let updateChecker: any UpdateChecking
@@ -40,6 +47,20 @@ final class PlayerViewModel {
         volume == 0
     }
 
+    var menuBarTitle: String? {
+        guard showTrackInMenuBar,
+              snapshot.isRunning,
+              let title = snapshot.track?.name,
+              !title.isEmpty else {
+            return nil
+        }
+
+        guard title.count > Self.maximumMenuBarTitleLength else {
+            return title
+        }
+        return String(title.prefix(Self.maximumMenuBarTitleLength - 1)) + "…"
+    }
+
     let appVersion: String
 
     init(
@@ -48,12 +69,15 @@ final class PlayerViewModel {
         updateChecker: any UpdateChecking = GitHubUpdateService(),
         appVersion: String = Bundle.main.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "0.0.0"
+        ) as? String ?? "0.0.0",
+        showTrackInMenuBar: Bool? = nil
     ) {
         self.spotify = spotify
         self.notifier = notifier
         self.updateChecker = updateChecker
         self.appVersion = appVersion
+        self.showTrackInMenuBar = showTrackInMenuBar
+            ?? UserDefaults.standard.bool(forKey: Self.menuBarTrackKey)
         if UserDefaults.standard.object(forKey: Self.notificationsKey) == nil {
             notificationsEnabled = true
         } else {

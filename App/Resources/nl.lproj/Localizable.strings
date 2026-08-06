@@ -1,4 +1,5 @@
 "app.accessibility_label" = "Spotify Notification";
+"app.accessibility_label_with_track" = "Spotify Notification, huidig nummer: %@";
 "player.spotify_closed.title" = "Spotify is gesloten";
 "player.spotify_closed.description" = "Open Spotify om het afspelen te bekijken en te bedienen.";
 "player.spotify_open" = "Open Spotify";
@@ -22,6 +23,7 @@
 "player.volume" = "Spotify-volume";
 "menu.track_notifications" = "Meldingen bij nummerwissel";
 "menu.launch_at_login" = "Open bij inloggen";
+"menu.show_track_in_menu_bar" = "Toon nummer in menubalk";
 "menu.version" = "Versie %@";
 "menu.check_for_updates" = "Zoek naar updates";
 "menu.checking_updates" = "Zoeken naar updates…";

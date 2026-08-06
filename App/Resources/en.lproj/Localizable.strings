@@ -1,4 +1,5 @@
 "app.accessibility_label" = "Spotify Notification";
+"app.accessibility_label_with_track" = "Spotify Notification, current track: %@";
 "player.spotify_closed.title" = "Spotify is closed";
 "player.spotify_closed.description" = "Open Spotify to view and control playback.";
 "player.spotify_open" = "Open Spotify";
@@ -22,6 +23,7 @@
 "player.volume" = "Spotify volume";
 "menu.track_notifications" = "Track change notifications";
 "menu.launch_at_login" = "Open at login";
+"menu.show_track_in_menu_bar" = "Show track in menu bar";
 "menu.version" = "Version %@";
 "menu.check_for_updates" = "Check for updates";
 "menu.checking_updates" = "Checking for updates…";

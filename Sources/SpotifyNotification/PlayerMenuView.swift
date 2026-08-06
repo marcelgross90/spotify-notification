@@ -232,6 +232,10 @@ struct PlayerMenuView: View {
                     }
                 )
             )
+            Toggle(
+                L10n.string("menu.show_track_in_menu_bar"),
+                isOn: $model.showTrackInMenuBar
+            )
 
             Divider()
 
