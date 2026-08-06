@@ -7,9 +7,15 @@ import Observation
 final class PlayerViewModel {
     private(set) var snapshot: SpotifySnapshot = .notRunning
     private(set) var errorMessage: String?
+    private(set) var notificationMessage: String?
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
+            if notificationsEnabled {
+                requestNotificationAuthorization()
+            } else {
+                notificationMessage = nil
+            }
         }
     }
     var launchAtLoginEnabled: Bool = LaunchAtLoginService.isEnabled
@@ -22,7 +28,7 @@ final class PlayerViewModel {
 
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
-        notifier: TrackNotifying = NowPlayingOverlayController()
+        notifier: TrackNotifying = TrackNotificationService()
     ) {
         self.spotify = spotify
         self.notifier = notifier
@@ -37,6 +43,10 @@ final class PlayerViewModel {
 
     func start() {
         guard pollingTask == nil else { return }
+
+        if notificationsEnabled {
+            requestNotificationAuthorization()
+        }
 
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -77,18 +87,6 @@ final class PlayerViewModel {
         spotify.openCurrentTrack(snapshot.track)
     }
 
-    func previewOverlay() {
-        let track = snapshot.track ?? SpotifyTrack(
-            id: "overlay-preview",
-            name: "Titel der Wiedergabe",
-            artist: "Künstler",
-            album: "Album",
-            artworkURL: nil,
-            spotifyURL: nil
-        )
-        Task { await notifier.notify(track: track) }
-    }
-
     func setLaunchAtLogin(_ enabled: Bool) {
         do {
             try LaunchAtLoginService.setEnabled(enabled)
@@ -121,5 +119,18 @@ final class PlayerViewModel {
         }
 
         Task { await notifier.notify(track: track) }
+    }
+
+    private func requestNotificationAuthorization() {
+        Task {
+            do {
+                let granted = try await notifier.requestAuthorization()
+                notificationMessage = granted
+                    ? nil
+                    : "Mitteilungen sind in den macOS-Systemeinstellungen deaktiviert."
+            } catch {
+                notificationMessage = "Mitteilungen konnten nicht aktiviert werden: \(error.localizedDescription)"
+            }
+        }
     }
 }

@@ -14,13 +14,16 @@ struct PlayerMenuView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
+            if let notificationMessage = model.notificationMessage {
+                Text(notificationMessage)
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             Divider()
 
-            Toggle("Titelwechsel anzeigen", isOn: $model.notificationsEnabled)
-
-            Button("Einblendung testen") {
-                model.previewOverlay()
-            }
+            Toggle("Titelwechsel-Mitteilungen", isOn: $model.notificationsEnabled)
 
             Toggle(
                 "Beim Anmelden öffnen",
