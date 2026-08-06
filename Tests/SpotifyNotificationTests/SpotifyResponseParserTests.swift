@@ -14,7 +14,7 @@ struct SpotifyResponseParserTests {
             "Album Name",
             "https://example.com/cover.jpg",
             "spotify:track:123",
-            "245",
+            "245000",
             "42.5",
             "65"
         ].joined(separator: separator)
@@ -32,11 +32,25 @@ struct SpotifyResponseParserTests {
     }
 
     @Test
+    func convertsSpotifyDurationFromMillisecondsToSeconds() throws {
+        let separator = SpotifyResponseParser.separator
+        let response = [
+            "track", "playing", "id", "Short Song", "Artist", "Album", "", "",
+            "9500", "3.25", "50"
+        ].joined(separator: separator)
+
+        let snapshot = try SpotifyResponseParser.parse(response)
+
+        #expect(snapshot.track?.duration == 9.5)
+        #expect(snapshot.position == 3.25)
+    }
+
+    @Test
     func parsesLocalizedDecimalPosition() throws {
         let separator = SpotifyResponseParser.separator
         let response = [
             "track", "paused", "id", "Song", "Artist", "Album", "", "",
-            "180", "12,5", "40"
+            "180000", "12,5", "40"
         ].joined(separator: separator)
 
         let snapshot = try SpotifyResponseParser.parse(response)
