@@ -26,8 +26,7 @@
 "menu.show_track_in_menu_bar" = "Toon nummer in menubalk";
 "menu.version" = "Versie %@ (%@)";
 "menu.check_for_updates" = "Zoek naar updates";
-"menu.automatic_update_checks.enabled" = "Automatisch zoeken naar updates: Aan";
-"menu.automatic_update_checks.disabled" = "Automatisch zoeken naar updates: Uit";
+"menu.automatic_update_checks" = "Automatisch naar updates zoeken";
 "menu.quit" = "Stop";
 "menu.more_options" = "Meer opties";
 "error.launch_at_login" = "Openen bij inloggen kon niet worden gewijzigd: %@";

@@ -45,8 +45,9 @@ final class PlayerViewModel {
     }
 
     var automaticallyChecksForUpdates: Bool {
-        get { updateController.automaticallyChecksForUpdates }
-        set { updateController.automaticallyChecksForUpdates = newValue }
+        didSet {
+            updateController.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+        }
     }
 
     var menuBarTitle: String? {
@@ -81,6 +82,7 @@ final class PlayerViewModel {
         self.spotify = spotify
         self.notifier = notifier
         self.updateController = updateController
+        self.automaticallyChecksForUpdates = updateController.automaticallyChecksForUpdates
         self.appVersion = appVersion
         self.appBuild = appBuild
         self.showTrackInMenuBar = showTrackInMenuBar

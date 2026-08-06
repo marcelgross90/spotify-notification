@@ -26,8 +26,7 @@
 "menu.show_track_in_menu_bar" = "Afficher le titre dans la barre des menus";
 "menu.version" = "Version %@ (%@)";
 "menu.check_for_updates" = "Rechercher des mises à jour";
-"menu.automatic_update_checks.enabled" = "Recherche automatique des mises à jour : Activée";
-"menu.automatic_update_checks.disabled" = "Recherche automatique des mises à jour : Désactivée";
+"menu.automatic_update_checks" = "Rechercher automatiquement les mises à jour";
 "menu.quit" = "Quitter";
 "menu.more_options" = "Plus d’options";
 "error.launch_at_login" = "L’ouverture à la connexion n’a pas pu être modifiée : %@";

@@ -204,6 +204,20 @@ struct PlayerViewModelTests {
     }
 
     @Test
+    func readsAutomaticUpdateChecksFromUpdater() {
+        let updater = AppUpdaterFake()
+        updater.automaticallyChecksForUpdates = true
+
+        let model = PlayerViewModel(
+            spotify: SpotifyControllerFake(),
+            notifier: TrackNotifierFake(),
+            updateController: updater
+        )
+
+        #expect(model.automaticallyChecksForUpdates)
+    }
+
+    @Test
     func exposesCurrentTrackForMenuBarWhenEnabled() {
         let spotify = SpotifyControllerFake()
         spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)

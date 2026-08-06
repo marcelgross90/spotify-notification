@@ -238,18 +238,10 @@ struct PlayerMenuView: View {
             Divider()
 
             Text(L10n.format("menu.version", model.appVersion, model.appBuild))
-            Button {
-                model.automaticallyChecksForUpdates.toggle()
-            } label: {
-                Label(
-                    model.automaticallyChecksForUpdates
-                        ? L10n.string("menu.automatic_update_checks.enabled")
-                        : L10n.string("menu.automatic_update_checks.disabled"),
-                    systemImage: model.automaticallyChecksForUpdates
-                        ? "checkmark.circle.fill"
-                        : "circle"
-                )
-            }
+            Toggle(
+                L10n.string("menu.automatic_update_checks"),
+                isOn: $model.automaticallyChecksForUpdates
+            )
             Button(
                 L10n.string("menu.check_for_updates"),
                 action: checkForUpdates

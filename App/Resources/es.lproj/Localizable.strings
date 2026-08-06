@@ -26,8 +26,7 @@
 "menu.show_track_in_menu_bar" = "Mostrar pista en la barra de menús";
 "menu.version" = "Versión %@ (%@)";
 "menu.check_for_updates" = "Buscar actualizaciones";
-"menu.automatic_update_checks.enabled" = "Búsqueda automática de actualizaciones: Activada";
-"menu.automatic_update_checks.disabled" = "Búsqueda automática de actualizaciones: Desactivada";
+"menu.automatic_update_checks" = "Buscar actualizaciones automáticamente";
 "menu.quit" = "Salir";
 "menu.more_options" = "Más opciones";
 "error.launch_at_login" = "No se pudo cambiar la apertura al iniciar sesión: %@";
