@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDevelopmentRegion</key>
-    <string>de</string>
+    <string>en</string>
     <key>CFBundleExecutable</key>
     <string>SpotifyNotification</string>
     <key>CFBundleIdentifier</key>
@@ -17,15 +17,25 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.4.3</string>
+    <string>0.5.0</string>
     <key>CFBundleVersion</key>
-    <string>14</string>
+    <string>15</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>de</string>
+        <string>en</string>
+        <string>es</string>
+        <string>fr</string>
+        <string>it</string>
+        <string>nl</string>
+        <string>pt</string>
+    </array>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSAppleEventsUsageDescription</key>
-    <string>Spotify Notification liest den aktuellen Titel und steuert die lokale Spotify-Wiedergabe.</string>
+    <string>Spotify Notification reads the current track and controls local Spotify playback.</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Marcel Groß</string>
 </dict>

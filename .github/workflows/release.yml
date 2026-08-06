@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate release tag
+        run: |
+          app_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' App/Info.plist)"
+          if [[ "$GITHUB_REF_NAME" != "v$app_version" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match app version $app_version." >&2
+            exit 1
+          fi
+      - name: Test
+        run: make test
+      - name: Build app
+        run: make app
+      - name: Package release
+        id: package
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          archive="Spotify-Notification-$version.zip"
+          ditto -c -k --sequesterRsrc --keepParent "dist/Spotify Notification.app" "$archive"
+          shasum -a 256 "$archive" > "$archive.sha256"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          archive="${{ steps.package.outputs.archive }}"
+          gh release create "$GITHUB_REF_NAME" \
+            "$archive" \
+            "$archive.sha256" \
+            --title "Spotify Notification $GITHUB_REF_NAME" \
+            --generate-notes

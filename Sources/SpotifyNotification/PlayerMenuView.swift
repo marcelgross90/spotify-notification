@@ -16,6 +16,10 @@ struct PlayerMenuView: View {
                 if let notificationMessage = model.notificationMessage {
                     statusMessage(notificationMessage, color: .orange)
                 }
+
+                if let updateMessage = model.updateMessage {
+                    updateStatusMessage(updateMessage)
+                }
             }
             .padding(22)
         }
@@ -27,10 +31,10 @@ struct PlayerMenuView: View {
     private var playerContent: some View {
         if !model.snapshot.isRunning {
             unavailablePlayer(
-                title: "Spotify ist geschlossen",
+                title: L10n.string("player.spotify_closed.title"),
                 systemImage: "music.note",
-                description: "Öffne Spotify, um die Wiedergabe anzuzeigen und zu steuern.",
-                buttonTitle: "Spotify öffnen"
+                description: L10n.string("player.spotify_closed.description"),
+                buttonTitle: L10n.string("player.spotify_open")
             )
         } else if let track = model.snapshot.track {
             VStack(alignment: .leading, spacing: 18) {
@@ -42,10 +46,10 @@ struct PlayerMenuView: View {
             }
         } else {
             unavailablePlayer(
-                title: "Keine Wiedergabe",
+                title: L10n.string("player.no_playback.title"),
                 systemImage: "pause.circle",
-                description: "Starte einen Titel in Spotify.",
-                buttonTitle: "Spotify anzeigen"
+                description: L10n.string("player.no_playback.description"),
+                buttonTitle: L10n.string("player.spotify_show")
             )
         }
     }
@@ -92,7 +96,7 @@ struct PlayerMenuView: View {
                     )
                     .controlSize(.small)
                     .tint(spotifyGreen)
-                    .accessibilityLabel("Wiedergabeposition")
+                    .accessibilityLabel(L10n.string("player.position"))
                     .accessibilityValue(formattedTime(displayedPosition))
 
                     HStack {
@@ -114,19 +118,23 @@ struct PlayerMenuView: View {
                 "shuffle",
                 isActive: model.snapshot.isShuffling,
                 isEnabled: model.snapshot.isShuffleAvailable,
-                activeLabel: "Shuffle ausschalten",
-                inactiveLabel: "Shuffle einschalten",
+                activeLabel: L10n.string("player.shuffle.disable"),
+                inactiveLabel: L10n.string("player.shuffle.enable"),
                 action: { model.toggleShuffle() }
             )
-            controlButton("backward.fill", "Vorheriger Titel", model.previousTrack)
+            controlButton(
+                "backward.fill",
+                L10n.string("player.previous"),
+                model.previousTrack
+            )
             playPauseButton
-            controlButton("forward.fill", "Nächster Titel", model.nextTrack)
+            controlButton("forward.fill", L10n.string("player.next"), model.nextTrack)
             modeButton(
                 "repeat",
                 isActive: model.snapshot.isRepeating,
                 isEnabled: model.snapshot.isRepeatAvailable,
-                activeLabel: "Wiederholung ausschalten",
-                inactiveLabel: "Wiederholung einschalten",
+                activeLabel: L10n.string("player.repeat.disable"),
+                inactiveLabel: L10n.string("player.repeat.enable"),
                 action: { model.toggleRepeat() }
             )
             Spacer(minLength: 0)
@@ -136,7 +144,9 @@ struct PlayerMenuView: View {
     @ViewBuilder
     private var playPauseButton: some View {
         let systemName = model.snapshot.state == .playing ? "pause.fill" : "play.fill"
-        let label = model.snapshot.state == .playing ? "Pause" : "Wiedergabe"
+        let label = model.snapshot.state == .playing
+            ? L10n.string("player.pause")
+            : L10n.string("player.play")
 
         if #available(macOS 26.0, *) {
             Button(action: model.playPause) {
@@ -160,7 +170,7 @@ struct PlayerMenuView: View {
 
     private var playerFooter: some View {
         HStack(spacing: 14) {
-            Button("In Spotify anzeigen", action: model.openCurrentTrack)
+            Button(L10n.string("player.show_in_spotify"), action: model.openCurrentTrack)
                 .buttonStyle(.plain)
                 .font(.system(size: 14, weight: .medium))
 
@@ -179,8 +189,16 @@ struct PlayerMenuView: View {
                     .foregroundStyle(model.isMuted ? spotifyGreen : Color.secondary)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(model.isMuted ? "Spotify-Ton einschalten" : "Spotify stummschalten")
-            .help(model.isMuted ? "Ton einschalten" : "Stummschalten")
+            .accessibilityLabel(
+                model.isMuted
+                    ? L10n.string("player.unmute_spotify")
+                    : L10n.string("player.mute_spotify")
+            )
+            .help(
+                model.isMuted
+                    ? L10n.string("player.unmute")
+                    : L10n.string("player.mute")
+            )
 
             Slider(
                 value: Binding(
@@ -195,15 +213,18 @@ struct PlayerMenuView: View {
             .frame(width: 78)
             .controlSize(.small)
             .tint(spotifyGreen)
-            .accessibilityLabel("Spotify-Lautstärke")
+            .accessibilityLabel(L10n.string("player.volume"))
         }
     }
 
     private var optionsMenu: some View {
         Menu {
-            Toggle("Titelwechsel-Mitteilungen", isOn: $model.notificationsEnabled)
             Toggle(
-                "Beim Anmelden öffnen",
+                L10n.string("menu.track_notifications"),
+                isOn: $model.notificationsEnabled
+            )
+            Toggle(
+                L10n.string("menu.launch_at_login"),
                 isOn: Binding(
                     get: { model.launchAtLoginEnabled },
                     set: { enabled in
@@ -214,7 +235,18 @@ struct PlayerMenuView: View {
 
             Divider()
 
-            Button("Beenden", action: model.quit)
+            Text(L10n.format("menu.version", model.appVersion))
+            Button(
+                model.isCheckingForUpdates
+                    ? L10n.string("menu.checking_updates")
+                    : L10n.string("menu.check_for_updates"),
+                action: model.checkForUpdates
+            )
+            .disabled(model.isCheckingForUpdates)
+
+            Divider()
+
+            Button(L10n.string("menu.quit"), action: model.quit)
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 15, weight: .semibold))
@@ -224,8 +256,8 @@ struct PlayerMenuView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .accessibilityLabel("Weitere Optionen")
-        .help("Weitere Optionen")
+        .accessibilityLabel(L10n.string("menu.more_options"))
+        .help(L10n.string("menu.more_options"))
     }
 
     private func unavailablePlayer(
@@ -255,6 +287,23 @@ struct PlayerMenuView: View {
             .font(.caption)
             .foregroundStyle(color)
             .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func updateStatusMessage(_ message: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Label(message, systemImage: "arrow.triangle.2.circlepath.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+
+            if model.availableUpdateURL != nil {
+                Button(L10n.string("update.open_release"), action: model.openAvailableUpdate)
+                    .buttonStyle(.link)
+                    .font(.caption)
+            }
+        }
     }
 
     private func formattedTime(_ seconds: TimeInterval) -> String {

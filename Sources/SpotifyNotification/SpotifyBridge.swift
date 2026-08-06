@@ -164,7 +164,7 @@ final class SpotifyBridge: SpotifyControlling {
             }
 
             let message = error[NSAppleScript.errorMessage] as? String
-                ?? "Unbekannter AppleScript-Fehler"
+                ?? L10n.string("error.spotify.unknown_applescript")
             throw SpotifyBridgeError.script(message: message)
         }
 

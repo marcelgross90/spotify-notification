@@ -174,6 +174,29 @@ struct PlayerViewModelTests {
         #expect(spotify.lastRepeatState == false)
     }
 
+    @Test
+    func exposesAvailableUpdateFromUpdateChecker() async {
+        let releaseURL = URL(
+            string: "https://github.com/marcelgross90/spotify-notification/releases/tag/v0.6.0"
+        )!
+        let model = PlayerViewModel(
+            spotify: SpotifyControllerFake(),
+            notifier: TrackNotifierFake(),
+            updateChecker: UpdateCheckerFake(
+                result: .updateAvailable(version: "0.6.0", releaseURL: releaseURL)
+            ),
+            appVersion: "0.5.0"
+        )
+
+        model.checkForUpdates()
+        while model.isCheckingForUpdates {
+            await Task.yield()
+        }
+
+        #expect(model.availableUpdateURL == releaseURL)
+        #expect(model.updateMessage != nil)
+    }
+
     private func playingSnapshot(
         duration: TimeInterval,
         position: TimeInterval,
@@ -247,4 +270,12 @@ private final class TrackNotifierFake: TrackNotifying {
     }
 
     func notify(track: SpotifyTrack) async {}
+}
+
+private struct UpdateCheckerFake: UpdateChecking {
+    let result: UpdateCheckResult
+
+    func check(currentVersion: String) async throws -> UpdateCheckResult {
+        result
+    }
 }

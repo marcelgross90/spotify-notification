@@ -88,11 +88,11 @@ enum SpotifyBridgeError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .automationDenied:
-            "macOS hat den Zugriff auf Spotify nicht erlaubt. Bitte aktiviere ihn unter Datenschutz & Sicherheit > Automation."
+            L10n.string("error.spotify.automation_denied")
         case .malformedResponse:
-            "Spotify hat unerwartete Wiedergabedaten geliefert."
+            L10n.string("error.spotify.malformed_response")
         case let .script(message):
-            "Spotify konnte nicht abgefragt werden: \(message)"
+            L10n.format("error.spotify.script", message)
         }
     }
 }

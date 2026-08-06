@@ -11,6 +11,9 @@ final class PlayerViewModel {
     private(set) var volume: Double = 0
     private(set) var position: Double = 0
     private(set) var isSeeking = false
+    private(set) var isCheckingForUpdates = false
+    private(set) var updateMessage: String?
+    private(set) var availableUpdateURL: URL?
     var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: Self.notificationsKey)
@@ -26,6 +29,7 @@ final class PlayerViewModel {
     private static let notificationsKey = "notificationsEnabled"
     private let spotify: SpotifyControlling
     private let notifier: TrackNotifying
+    private let updateChecker: any UpdateChecking
     private var pollingTask: Task<Void, Never>?
     private var trackChangeDetector = TrackChangeDetector()
     private var isAdjustingVolume = false
@@ -36,12 +40,20 @@ final class PlayerViewModel {
         volume == 0
     }
 
+    let appVersion: String
+
     init(
         spotify: SpotifyControlling = SpotifyBridge(),
-        notifier: TrackNotifying = TrackNotificationService()
+        notifier: TrackNotifying = TrackNotificationService(),
+        updateChecker: any UpdateChecking = GitHubUpdateService(),
+        appVersion: String = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "0.0.0"
     ) {
         self.spotify = spotify
         self.notifier = notifier
+        self.updateChecker = updateChecker
+        self.appVersion = appVersion
         if UserDefaults.standard.object(forKey: Self.notificationsKey) == nil {
             notificationsEnabled = true
         } else {
@@ -188,8 +200,36 @@ final class PlayerViewModel {
             errorMessage = nil
         } catch {
             launchAtLoginEnabled = LaunchAtLoginService.isEnabled
-            errorMessage = "Autostart konnte nicht geändert werden: \(error.localizedDescription)"
+            errorMessage = L10n.format("error.launch_at_login", error.localizedDescription)
         }
+    }
+
+    func checkForUpdates() {
+        guard !isCheckingForUpdates else { return }
+
+        isCheckingForUpdates = true
+        updateMessage = nil
+        availableUpdateURL = nil
+
+        Task {
+            do {
+                switch try await updateChecker.check(currentVersion: appVersion) {
+                case .upToDate:
+                    updateMessage = L10n.format("update.status.current", appVersion)
+                case let .updateAvailable(version, releaseURL):
+                    updateMessage = L10n.format("update.status.available", version)
+                    availableUpdateURL = releaseURL
+                }
+            } catch {
+                updateMessage = L10n.format("update.status.failed", error.localizedDescription)
+            }
+            isCheckingForUpdates = false
+        }
+    }
+
+    func openAvailableUpdate() {
+        guard let availableUpdateURL else { return }
+        NSWorkspace.shared.open(availableUpdateURL)
     }
 
     func quit() {
@@ -221,9 +261,12 @@ final class PlayerViewModel {
                 let granted = try await notifier.requestAuthorization()
                 notificationMessage = granted
                     ? nil
-                    : "Mitteilungen sind in den macOS-Systemeinstellungen deaktiviert."
+                    : L10n.string("notification.permission.disabled")
             } catch {
-                notificationMessage = "Mitteilungen konnten nicht aktiviert werden: \(error.localizedDescription)"
+                notificationMessage = L10n.format(
+                    "notification.permission.failed",
+                    error.localizedDescription
+                )
             }
         }
     }

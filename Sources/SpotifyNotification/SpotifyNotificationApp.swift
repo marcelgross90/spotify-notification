@@ -16,7 +16,7 @@ struct SpotifyNotificationApp: App {
             PlayerMenuView(model: model)
         } label: {
             Image(nsImage: SpotifyMenuBarIcon.image)
-                .accessibilityLabel("Spotify Notification")
+                .accessibilityLabel(L10n.string("app.accessibility_label"))
         }
         .menuBarExtraStyle(.window)
     }

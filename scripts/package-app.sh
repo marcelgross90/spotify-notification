@@ -23,6 +23,7 @@ mkdir -p "$contents_path/MacOS" "$contents_path/Resources"
 cp "$binary_path" "$contents_path/MacOS/SpotifyNotification"
 cp "$project_root/App/Info.plist" "$contents_path/Info.plist"
 cp "$project_root/App/AppIcon.icns" "$contents_path/Resources/AppIcon.icns"
+ditto "$project_root/App/Resources" "$contents_path/Resources"
 
 codesign --force --deep --sign - "$app_path"
 
