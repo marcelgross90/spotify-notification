@@ -14,4 +14,4 @@ app:
 
 clean:
 	swift package --scratch-path .build clean
-	rm -rf dist
+	rm -rf .build/xcode dist
