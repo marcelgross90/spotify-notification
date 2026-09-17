@@ -31,24 +31,27 @@ swift build \
     --scratch-path "$build_path" \
     --configuration "$configuration"
 
-binary_path="$(swift build \
+products_path="$(swift build \
     --package-path "$project_root" \
     --scratch-path "$build_path" \
     --configuration "$configuration" \
-    --show-bin-path)/SpotifyNotification"
+    --show-bin-path)"
+binary_path="$products_path/SpotifyNotification"
 
 mkdir -p "$contents_path/MacOS" "$contents_path/Resources" "$frameworks_path"
 cp "$binary_path" "$contents_path/MacOS/SpotifyNotification"
 cp "$project_root/App/Info.plist" "$contents_path/Info.plist"
 cp "$project_root/App/AppIcon.icns" "$contents_path/Resources/AppIcon.icns"
 ditto "$project_root/App/Resources" "$contents_path/Resources"
-ditto "$build_path/arm64-apple-macosx/$configuration/Sparkle.framework" \
+ditto "$products_path/Sparkle.framework" \
     "$frameworks_path/Sparkle.framework"
-keyboard_shortcuts_bundle="$build_path/arm64-apple-macosx/$configuration/KeyboardShortcuts_KeyboardShortcuts.bundle"
-if [[ -d "$keyboard_shortcuts_bundle" ]]; then
-    ditto "$keyboard_shortcuts_bundle" \
-        "$contents_path/Resources/KeyboardShortcuts_KeyboardShortcuts.bundle"
+keyboard_shortcuts_bundle="$products_path/KeyboardShortcuts_KeyboardShortcuts.bundle"
+if [[ ! -d "$keyboard_shortcuts_bundle" ]]; then
+    echo "Missing KeyboardShortcuts resource bundle at $keyboard_shortcuts_bundle" >&2
+    exit 1
 fi
+ditto "$keyboard_shortcuts_bundle" \
+    "$contents_path/Resources/KeyboardShortcuts_KeyboardShortcuts.bundle"
 mkdir -p "$contents_path/Resources/Licenses"
 cp "$build_path/artifacts/sparkle/Sparkle/LICENSE" \
     "$contents_path/Resources/Licenses/Sparkle.txt"
