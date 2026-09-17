@@ -52,6 +52,7 @@
 "settings.permissions" = "Permissões";
 "settings.updates" = "Atualizações";
 "settings.general.behavior" = "Comportamento";
+"settings.notifications.sound" = "Reproduzir som de notificação";
 "settings.menu_bar" = "Barra de menus";
 "settings.menu_bar.content" = "Exibição";
 "settings.menu_bar.maximum_length" = "Comprimento máximo do texto";

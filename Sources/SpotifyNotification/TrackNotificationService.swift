@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 protocol TrackNotifying {
     func requestAuthorization() async throws -> Bool
-    func notify(track: SpotifyTrack) async
+    func notify(track: SpotifyTrack, playsSound: Bool) async
 }
 
 @MainActor
@@ -20,12 +20,12 @@ final class TrackNotificationService: NSObject, TrackNotifying, UNUserNotificati
         try await center.requestAuthorization(options: [.alert, .sound])
     }
 
-    func notify(track: SpotifyTrack) async {
+    func notify(track: SpotifyTrack, playsSound: Bool) async {
         let content = UNMutableNotificationContent()
         content.title = track.name
         content.subtitle = track.artist
         content.body = track.album
-        content.sound = .default
+        content.sound = playsSound ? .default : nil
         if let attachment = await artworkAttachment(for: track) {
             content.attachments = [attachment]
         }
@@ -119,6 +119,10 @@ final class TrackNotificationService: NSObject, TrackNotifying, UNUserNotificati
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        completionHandler([.banner, .sound])
+        if notification.request.content.sound == nil {
+            completionHandler([.banner])
+        } else {
+            completionHandler([.banner, .sound])
+        }
     }
 }

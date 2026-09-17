@@ -14,6 +14,7 @@ A lightweight macOS menu bar player for the locally installed Spotify desktop ap
 - Spotify volume control and mute toggle
 - Shuffle and context repeat when supported by the current Spotify playback context
 - Native macOS track-change notifications with cover art
+- Optional notification sound that can be turned off so it does not interrupt playback
 - Optional launch at login
 - Optional current track title next to the menu bar icon
 - Configurable menu bar text format and length

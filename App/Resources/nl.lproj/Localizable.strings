@@ -52,6 +52,7 @@
 "settings.permissions" = "Toestemmingen";
 "settings.updates" = "Updates";
 "settings.general.behavior" = "Gedrag";
+"settings.notifications.sound" = "Meldingsgeluid afspelen";
 "settings.menu_bar" = "Menubalk";
 "settings.menu_bar.content" = "Weergave";
 "settings.menu_bar.maximum_length" = "Maximale tekstlengte";

@@ -49,6 +49,11 @@ private struct GeneralSettingsView: View {
                     isOn: $model.notificationsEnabled
                 )
                 Toggle(
+                    L10n.string("settings.notifications.sound"),
+                    isOn: $model.notificationSoundEnabled
+                )
+                .disabled(!model.notificationsEnabled)
+                Toggle(
                     L10n.string("menu.launch_at_login"),
                     isOn: Binding(
                         get: { model.launchAtLoginEnabled },
