@@ -52,6 +52,7 @@
 "settings.permissions" = "Berechtigungen";
 "settings.updates" = "Updates";
 "settings.general.behavior" = "Verhalten";
+"settings.notifications.sound" = "Mitteilungston abspielen";
 "settings.menu_bar" = "Menüleiste";
 "settings.menu_bar.content" = "Anzeige";
 "settings.menu_bar.maximum_length" = "Maximale Textlänge";

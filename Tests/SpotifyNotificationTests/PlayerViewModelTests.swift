@@ -296,6 +296,54 @@ struct PlayerViewModelTests {
     }
 
     @Test
+    func notifiesWithSoundWhenSoundIsEnabled() async {
+        let spotify = SpotifyControllerFake()
+        let notifier = TrackNotifierFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: notifier,
+            notificationSoundEnabled: true
+        )
+
+        model.refresh()
+        spotify.snapshotValue = playingSnapshot(
+            trackID: "next-track",
+            duration: 200,
+            position: 0
+        )
+        model.refresh()
+        await Task.yield()
+
+        #expect(notifier.notifiedTracks.count == 1)
+        #expect(notifier.lastPlaysSound == true)
+    }
+
+    @Test
+    func notifiesSilentlyWhenSoundIsDisabled() async {
+        let spotify = SpotifyControllerFake()
+        let notifier = TrackNotifierFake()
+        spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
+        let model = PlayerViewModel(
+            spotify: spotify,
+            notifier: notifier,
+            notificationSoundEnabled: false
+        )
+
+        model.refresh()
+        spotify.snapshotValue = playingSnapshot(
+            trackID: "next-track",
+            duration: 200,
+            position: 0
+        )
+        model.refresh()
+        await Task.yield()
+
+        #expect(notifier.notifiedTracks.count == 1)
+        #expect(notifier.lastPlaysSound == false)
+    }
+
+    @Test
     func sleepTimerPausesPlaybackAfterDeadline() {
         let spotify = SpotifyControllerFake()
         spotify.snapshotValue = playingSnapshot(duration: 245, position: 42)
@@ -346,6 +394,7 @@ struct PlayerViewModelTests {
     }
 
     private func playingSnapshot(
+        trackID: String = "track",
         duration: TimeInterval,
         position: TimeInterval,
         isShuffleAvailable: Bool = false,
@@ -357,7 +406,7 @@ struct PlayerViewModelTests {
             isRunning: true,
             state: .playing,
             track: SpotifyTrack(
-                id: "track",
+                id: trackID,
                 name: "Song",
                 artist: "Artist",
                 album: "Album",
@@ -416,11 +465,17 @@ private final class SpotifyControllerFake: SpotifyControlling {
 
 @MainActor
 private final class TrackNotifierFake: TrackNotifying {
+    var notifiedTracks: [SpotifyTrack] = []
+    var lastPlaysSound: Bool?
+
     func requestAuthorization() async throws -> Bool {
         true
     }
 
-    func notify(track: SpotifyTrack) async {}
+    func notify(track: SpotifyTrack, playsSound: Bool) async {
+        notifiedTracks.append(track)
+        lastPlaysSound = playsSound
+    }
 }
 
 @MainActor

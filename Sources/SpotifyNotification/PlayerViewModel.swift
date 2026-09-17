@@ -23,6 +23,11 @@ final class PlayerViewModel {
             }
         }
     }
+    var notificationSoundEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(notificationSoundEnabled, forKey: Self.notificationSoundKey)
+        }
+    }
     var menuBarDisplayMode: MenuBarDisplayMode {
         didSet {
             UserDefaults.standard.set(menuBarDisplayMode.rawValue, forKey: Self.menuBarDisplayModeKey)
@@ -41,6 +46,7 @@ final class PlayerViewModel {
     private(set) var sleepTimer: SleepTimerState?
 
     private static let notificationsKey = "notificationsEnabled"
+    private static let notificationSoundKey = "notificationSoundEnabled"
     private static let menuBarTrackKey = "showTrackInMenuBar"
     private static let menuBarDisplayModeKey = "menuBarDisplayMode"
     private static let menuBarMaximumLengthKey = "menuBarMaximumLength"
@@ -108,7 +114,8 @@ final class PlayerViewModel {
         ) as? String ?? "0",
         showTrackInMenuBar: Bool? = nil,
         menuBarDisplayMode: MenuBarDisplayMode? = nil,
-        menuBarMaximumLength: Int? = nil
+        menuBarMaximumLength: Int? = nil,
+        notificationSoundEnabled: Bool? = nil
     ) {
         self.spotify = spotify
         self.notifier = notifier
@@ -146,6 +153,15 @@ final class PlayerViewModel {
         } else {
             notificationsEnabled = UserDefaults.standard.bool(
                 forKey: Self.notificationsKey
+            )
+        }
+        if let notificationSoundEnabled {
+            self.notificationSoundEnabled = notificationSoundEnabled
+        } else if UserDefaults.standard.object(forKey: Self.notificationSoundKey) == nil {
+            self.notificationSoundEnabled = true
+        } else {
+            self.notificationSoundEnabled = UserDefaults.standard.bool(
+                forKey: Self.notificationSoundKey
             )
         }
     }
@@ -353,7 +369,8 @@ final class PlayerViewModel {
             return
         }
 
-        Task { await notifier.notify(track: track) }
+        let playsSound = notificationSoundEnabled
+        Task { await notifier.notify(track: track, playsSound: playsSound) }
     }
 
     private func processSleepTimer(
